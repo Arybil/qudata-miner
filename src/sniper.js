@@ -239,6 +239,33 @@ async function tryRentForAccount(account, offers, workerCounter) {
   return { success: false, workerCounter };
 }
 
+// ─── AUTO-DELETE PENDING INSTANCES (BACKGROUND) ────────────────
+let cleanupRunning = false;
+async function cleanupPendingInstances(accounts) {
+  if (cleanupRunning) return;
+  cleanupRunning = true;
+  try {
+    for (const account of accounts) {
+      try {
+        const api = new QuDataAPI();
+        const ok = await api.login(account.email, account.password);
+        if (!ok) continue;
+        const instances = await api.getInstances();
+        for (const inst of instances) {
+          if (inst.status === 'pending') {
+            const age = inst.created_at ? (Date.now() - new Date(inst.created_at).getTime()) / 1000 : 0;
+            if (age > 30) { // pending > 30 detik = auto delete
+              log(`   🧹 [cleanup] ${account.email.substring(0,15)}.. pending ${age.toFixed(0)}s → delete`);
+              await api.deleteInstance(inst.id);
+            }
+          }
+        }
+      } catch {}
+    }
+  } catch {}
+  cleanupRunning = false;
+}
+
 // ─── MAIN ─────────────────────────────────────────────────────────
 async function main() {
   const accountFile = path.resolve(accountsFile);
@@ -254,6 +281,10 @@ async function main() {
 
   let workerCounter = 1;
   let round = 0;
+
+  // Background cleanup setiap 30 detik — hapus pending instances
+  setInterval(() => cleanupPendingInstances(accounts), 30 * 1000);
+  log('🧹 Auto-cleanup pending: aktif (tiap 30s)');
 
   while (true) {
     round++;
