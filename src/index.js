@@ -445,6 +445,9 @@ async function main() {
       return;
     }
 
+    // Auto-clean sebelum proses
+    await cleanInstances([account]);
+
     // Fetch offers
     log('Fetching GPU offers...');
     const sampleApi = new QuDataAPI();
