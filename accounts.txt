@@ -1,4 +1,2 @@
-=== [2026-01-01] ===
-Username: example_user
-Email: example@wshu.net
-Password: your_password_here
+example@wshu.net:your_password_here
+user2@email.com:password123

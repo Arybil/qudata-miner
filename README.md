@@ -46,20 +46,14 @@ npm install
 
 ### 2. Tambah akun di `accounts.txt`
 
-Format:
+Format (satu akun per baris, `email:password`):
 ```
-=== [tanggal] ===
-Username: nama_user
-Email: email@domain.com
-Password: password
-
-=== [tanggal] ===
-Username: user2
-Email: email2@domain.com
-Password: password2
+user1@domain.com:password1
+user2@domain.com:password2
+user3@domain.com:password3
 ```
 
-Bisa banyak akun, pisahkan dengan blank line.
+Bisa banyak akun, satu per baris. Baris kosong dan yang pakai `#` di-skip.
 
 ### 3. Generate SSH Key (kalau belum punya)
 
@@ -130,11 +124,11 @@ Setiap tahap ada timer akurat:
 
 ### `active-instances.txt`
 
-Format: `email|password|username|instance_id|ssh_host|ssh_port|gpu|worker|timestamp`
+Format: `email|password|instance_id|ssh_host|ssh_port|gpu|worker|timestamp`
 
 Contoh:
 ```
-user@wshu.net|pw123|user|6a195...|ssh3.qudata.ai|12353|GTX 1060|rig01|2026-05-29T10:00:00
+user@wshu.net|pw123|6a195...|ssh3.qudata.ai|12353|GTX 1060|rig01|2026-05-29T10:00:00
 ```
 
 ## Auto-Run dengan PM2 (biar jalan terus)

@@ -41,15 +41,17 @@ function elapsed(startMs) {
 
 function parseAccounts(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
-  const pattern = /Username:\s*(\S+)\s*\nEmail:\s*(\S+)\s*\nPassword:\s*(\S+)/g;
   const accounts = [];
-  let match;
-  while ((match = pattern.exec(content)) !== null) {
-    accounts.push({
-      username: match[1],
-      email: match[2],
-      password: match[3],
-    });
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('===') || trimmed.startsWith('Username:') || trimmed.startsWith('Email:') || trimmed.startsWith('Password:')) continue;
+    const sep = trimmed.indexOf(':');
+    if (sep === -1) continue;
+    const email = trimmed.substring(0, sep).trim();
+    const password = trimmed.substring(sep + 1).trim();
+    if (email && password && email.includes('@')) {
+      accounts.push({ email, password });
+    }
   }
   return accounts;
 }
@@ -66,11 +68,11 @@ function loadProcessed() {
   return processed;
 }
 
-function logActive(email, password, username, instId, sshHost, sshPort, gpu, worker) {
+function logActive(email, password, instId, sshHost, sshPort, gpu, worker) {
   const dir = path.dirname(activeLog);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const line = [
-    email, password, username, instId,
+    email, password, instId,
     sshHost, sshPort, gpu, worker,
     new Date().toISOString(),
   ].join('|') + '\n';
@@ -146,7 +148,7 @@ async function pollUntil(api, instanceId, conditionFn, timeoutSec, label) {
 // ─── RENT + MINE ONE ACCOUNT ───────────────────────────────────────
 async function processAccount(account, offers, workerCounter) {
   log(`\n${'─'.repeat(55)}`);
-  log(`Account: ${account.username} (${account.email})`);
+  log(`Account: ${account.email}`);
 
   const api = new QuDataAPI();
   const loggedIn = await api.login(account.email, account.password);
@@ -230,7 +232,7 @@ async function processAccount(account, offers, workerCounter) {
     if (mined) {
       log(`      🔥 MINING ACTIVE! ${gpu} → ${worker}`);
       logActive(
-        account.email, account.password, account.username,
+        account.email, account.password,
         instId, sshHost, sshPort, gpu, worker
       );
       return { success: true, workerCounter: workerCounter + 1 };
@@ -277,7 +279,6 @@ async function main() {
   // ── Single account mode ──
   if (args.email && args.password) {
     const account = {
-      username: args.email.split('@')[0],
       email: args.email,
       password: args.password,
     };
