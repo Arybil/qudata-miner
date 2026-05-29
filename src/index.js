@@ -189,14 +189,16 @@ async function processAccount(account, offers, workerCounter) {
     const offerId = offer.id;
     const durationMin = price > 0 ? (balance / price) * 60 : 0;
 
-    log(`\n   [${attempt}/${affordable.length}] 🎮 ${gpu} @ $${price}/hr (~${durationMin.toFixed(0)}min)`);
+    log(`\n   [${attempt}/${affordable.length}] 🎮 ${gpu} @ $${price}/hr (~${durationMin.toFixed(0)}min) [${offerId.substring(0, 8)}]`);
 
     await sleep(instanceDelay);
 
     const timerStart = Date.now();
     const instData = await api.createInstance(offerId, deploymentType, storageGb);
-    if (!instData) {
-      log(`      ❌ Create failed → next GPU`);
+    if (!instData || instData.error) {
+      const err = instData?.error || 'unknown';
+      const status = instData?.status || '';
+      log(`      ❌ Create failed (${err} ${status}) → next GPU`);
       continue;
     }
 
