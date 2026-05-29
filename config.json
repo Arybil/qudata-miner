@@ -6,7 +6,7 @@
   "deploymentType": "jupyter",
   "storageGb": 80,
   "priceMin": 0.30,
-  "priceMax": 2.50,
+  "priceMax": 3.50,
   "balanceMin": 0.10,
   "pendingTimeout": 60,
   "sshTimeout": 30,

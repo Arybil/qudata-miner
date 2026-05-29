@@ -79,19 +79,9 @@ class QuDataAPI {
   }
 
   // Filter out blacklisted providers (vast.ai etc)
+  // DISABLED - detect on instance status instead
   filterOffers(offers) {
-    const blacklist = ['vast', 'vastai', 'vast.ai'];
-    return offers.filter(o => {
-      const provider = (o.provider?.name || '').toLowerCase();
-      const gpu = (o.gpu_name || '').toLowerCase();
-      const image = (o.image || o.template?.image || '').toLowerCase();
-      const desc = (o.description || '').toLowerCase();
-      const allText = `${provider} ${gpu} ${image} ${desc}`;
-      for (const b of blacklist) {
-        if (allText.includes(b)) return false;
-      }
-      return true;
-    });
+    return offers;
   }
 
   async getTemplates() {
