@@ -8,7 +8,7 @@
   "priceMin": 0.30,
   "priceMax": 2.50,
   "balanceMin": 0.10,
-  "pendingTimeout": 30,
+  "pendingTimeout": 60,
   "sshTimeout": 10,
   "instanceDelay": 5,
   "activeLog": "./active-instances.txt",
