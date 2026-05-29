@@ -170,9 +170,10 @@ async function processAccount(account, offers, workerCounter) {
     return { success: false, workerCounter };
   }
 
-  // Filter offers by balance
-  const affordable = offers.filter(o => (o.prices?.[0]?.amount || 0) <= balance);
-  const skipped = offers.length - affordable.length;
+  // Filter offers by balance - DISABLED (billing per minute, balance cukup buat deploy)
+  // const affordable = offers.filter(o => (o.prices?.[0]?.amount || 0) <= balance);
+  const affordable = offers;
+  const skipped = 0;
   if (skipped > 0) log(`   ⏭️  ${skipped} offers skipped (price > balance)`);
 
   if (!affordable.length) {
@@ -320,8 +321,8 @@ async function main() {
     for (const o of offers) {
       const gpu = o.gpu_name || '?';
       const price = o.prices?.[0]?.amount || 0;
-      const affordable = price <= balance ? '✅' : '⏭️';
-      log(`   ${affordable} ${gpu.padEnd(25)} $${price.toFixed(2)}/hr`);
+      const mins = price > 0 ? (balance / price * 60).toFixed(0) : '?';
+      log(`   ✅ ${gpu.padEnd(25)} $${price.toFixed(2)}/hr (~${mins}min)`);
     }
 
     const result = await processAccount(account, offers, 1);
