@@ -1,11 +1,11 @@
 /**
- * QuData GPU Sniper v2
+ * QuData GPU Sniper v3 — Bulk Mode
  *
- * Monitor RENT status tiap 1 detik. Bukan marketplace.
- * Terus coba create instance dari offers yang ada, monitor status real-time.
+ * Monitor & rent untuk SEMUA akun di accounts.txt.
+ * Monitor status tiap 1 detik.
  *
  * Usage:
- *   node src/sniper.js --email user@x.com --password pw123
+ *   node src/sniper.js
  */
 
 const fs = require('fs');
@@ -21,8 +21,7 @@ const config = JSON.parse(
 const {
   wallet, pool, sshKeyName, sshPublicKey,
   deploymentType, image, storageGb,
-  priceMin, priceMax, balanceMin,
-  sshTimeout, activeLog,
+  priceMin, priceMax, activeLog, accountsFile,
 } = config;
 
 // ─── HELPERS ───────────────────────────────────────────────────────
@@ -49,15 +48,21 @@ function logActive(email, password, instId, sshHost, sshPort, gpu, worker) {
   fs.appendFileSync(activeLog, line);
 }
 
-// ─── PARSE ARGS ────────────────────────────────────────────────────
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const result = { email: null, password: null };
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--email' && args[i + 1]) result.email = args[++i];
-    if (args[i] === '--password' && args[i + 1]) result.password = args[++i];
+function parseAccounts(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const accounts = [];
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('===')) continue;
+    const sep = trimmed.indexOf(':');
+    if (sep === -1) continue;
+    const email = trimmed.substring(0, sep).trim();
+    const password = trimmed.substring(sep + 1).trim();
+    if (email && password && email.includes('@')) {
+      accounts.push({ email, password });
+    }
   }
-  return result;
+  return accounts;
 }
 
 // ─── POLL STATUS TIAP 1 DETIK ─────────────────────────────────────
@@ -70,15 +75,15 @@ async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
       const inst = instances.find(i => i.id === instanceId);
 
       if (!inst) {
-        process.stdout.write(`\r      [${sec}s] [${label}] Instance gone!`);
+        process.stdout.write(`\r      [${sec}s] [${label}] Instance gone!          `);
         return null;
       }
 
       const status = inst.status || '';
-      const msg = (inst.message || '').substring(0, 50);
+      const msg = (inst.message || '').substring(0, 40);
       const ssh = inst.ssh_enabled ? 'SSH:OK' : 'SSH:-';
 
-      process.stdout.write(`\r      [${sec}s] [${label}] ${status} ${ssh} ${msg}    `);
+      process.stdout.write(`\r      [${sec}s] [${label}] ${status} ${ssh} ${msg}      `);
 
       if (conditionFn(inst)) {
         console.log(`\n      [${sec}s] [${label}] ✅ Ready!`);
@@ -90,160 +95,156 @@ async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
         return null;
       }
 
-      // Cek vast.ai di message
       if (msg.includes('vast') || msg.includes('vastai')) {
         console.log(`\n      [${sec}s] [${label}] ⏭️ Vast.ai detected`);
         return 'vast_detected';
       }
-    } catch (e) {
-      // silent retry
-    }
+    } catch {}
 
-    await sleep(1); // tiap 1 detik
+    await sleep(1);
   }
 
   console.log(`\n      [${((Date.now() - start) / 1000).toFixed(0)}s] [${label}] ⏰ Timeout ${timeoutSec}s`);
   return null;
 }
 
-// ─── RENT + MINE SATU OFFER ───────────────────────────────────────
-async function tryRent(api, offer, keyId, workerCounter) {
-  const price = offer.prices?.[0]?.amount || 0;
-  const gpu = offer.gpu_name || '?';
-  const offerId = offer.id;
-  const mins = price > 0 ? (0.30 / price * 60).toFixed(0) : '?';
+// ─── RENT + MINE SATU AKUN ────────────────────────────────────────
+async function tryRentForAccount(account, offers, workerCounter) {
+  log(`\n${'─'.repeat(45)}`);
+  log(`👤 ${account.email}`);
 
-  log(`\n🎯 ${gpu} @ $${price}/hr (~${mins}min) [${offerId.substring(0, 8)}]`);
+  const api = new QuDataAPI();
+  const loggedIn = await api.login(account.email, account.password);
+  if (!loggedIn) { log('   ❌ Login failed'); return { success: false, workerCounter }; }
 
-  const timerStart = Date.now();
-  const instData = await api.createInstance(offerId, deploymentType, storageGb, image);
-  if (!instData || instData.error) {
-    log(`   ❌ Create failed`);
-    return { success: false };
-  }
+  const balance = await api.getBalance();
+  log(`   💰 $${balance.toFixed(3)} USDT`);
 
-  const instId = instData.id;
-  log(`   📦 ${instId.substring(0, 16)}...`);
+  if (balance < 0.05) { log('   ⏭️ Too low'); return { success: false, workerCounter }; }
 
-  // Cek vast.ai
-  let isVast = false;
-  const instInfo = JSON.stringify(instData).toLowerCase();
-  if (instInfo.includes('vast') || instInfo.includes('vastai')) {
-    isVast = true;
-    log(`   ⏭️  Vast.ai detected`);
-  }
+  const keyId = await api.ensureSSHKey(sshKeyName, sshPublicKey);
+  if (!keyId) { log('   ❌ SSH key failed'); return { success: false, workerCounter }; }
 
-  await api.attachSSHKey(instId, keyId);
-  log(`   🔑 SSH key attached`);
-
-  // Phase 1: Monitor running (tiap 1 detik)
-  const running = await pollStatus(api, instId, i => i.status === 'running', 120, 'pending');
-
-  if (running === 'vast_detected') {
-    isVast = true;
-    log(`   ⏭️  Vast.ai - tunggu running...`);
-    const running2 = await pollStatus(api, instId, i => i.status === 'running', 60, 'pending');
-    if (!running2 || running2 === 'vast_detected') {
-      log(`   ⏰ Still not running → delete`);
-      await api.deleteInstance(instId);
-      return { success: false };
+  // Clean existing instances
+  const existing = await api.getInstances();
+  if (existing.length) {
+    log(`   🧹 Cleaning ${existing.length} instance(s)...`);
+    for (const inst of existing) {
+      await api.deleteInstance(inst.id);
     }
-  } else if (!running) {
-    log(`   ⏰ Pending timeout → delete`);
-    await api.deleteInstance(instId);
-    return { success: false };
   }
 
-  // Phase 2: Monitor SSH port (tiap 1 detik)
-  const sshReady = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
+  // Try offers
+  for (const offer of offers) {
+    const price = offer.prices?.[0]?.amount || 0;
+    const gpu = offer.gpu_name || '?';
+    const mins = price > 0 ? (balance / price * 60).toFixed(0) : '?';
 
-  if (sshReady === 'vast_detected') {
-    isVast = true;
-    const sshReady2 = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
-    if (!sshReady2 || sshReady2 === 'vast_detected') {
-      log(`   ⏰ SSH not ready → delete`);
-      await api.deleteInstance(instId);
-      return { success: false };
+    log(`   🎯 ${gpu} @ $${price}/hr (~${mins}min)`);
+
+    const timerStart = Date.now();
+    const instData = await api.createInstance(offer.id, deploymentType, storageGb, image);
+    if (!instData || instData.error) {
+      log(`      ❌ Create failed`);
+      continue;
     }
-  } else if (!sshReady) {
-    log(`   ⏰ SSH timeout → delete`);
+
+    const instId = instData.id;
+    log(`      📦 ${instId.substring(0, 16)}...`);
+
+    let isVast = false;
+    const instInfo = JSON.stringify(instData).toLowerCase();
+    if (instInfo.includes('vast') || instInfo.includes('vastai')) {
+      isVast = true;
+      log(`      ⏭️ Vast.ai detected`);
+    }
+
+    await api.attachSSHKey(instId, keyId);
+    log(`      🔑 SSH key attached`);
+
+    // Monitor pending (1s interval)
+    const running = await pollStatus(api, instId, i => i.status === 'running', 120, 'pending');
+
+    if (running === 'vast_detected') {
+      isVast = true;
+      const running2 = await pollStatus(api, instId, i => i.status === 'running', 60, 'pending');
+      if (!running2 || running2 === 'vast_detected') {
+        log(`      ⏰ Not running → delete`);
+        await api.deleteInstance(instId);
+        continue;
+      }
+    } else if (!running) {
+      log(`      ⏰ Timeout → delete`);
+      await api.deleteInstance(instId);
+      continue;
+    }
+
+    // Monitor SSH (1s interval)
+    const sshReady = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh');
+
+    if (sshReady === 'vast_detected') {
+      isVast = true;
+      const sshReady2 = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh');
+      if (!sshReady2 || sshReady2 === 'vast_detected') {
+        log(`      ⏰ SSH not ready → delete`);
+        await api.deleteInstance(instId);
+        continue;
+      }
+    } else if (!sshReady) {
+      log(`      ⏰ SSH timeout → delete`);
+      await api.deleteInstance(instId);
+      continue;
+    }
+
+    const sshHost = sshReady.ssh_host;
+    const sshPort = sshReady.ssh_port;
+    const totalTime = ((Date.now() - timerStart) / 1000).toFixed(0);
+    log(`      ✅ SSH: root@${sshHost} -p ${sshPort} (${totalTime}s)`);
+
+    const worker = `rig${String(workerCounter).padStart(2, '0')}`;
+    log(`      ⛏️ Mining as ${worker}...`);
+
+    const mined = deployMiner(sshHost, sshPort, wallet, pool, worker, isVast);
+    if (mined) {
+      log(`      🔥 MINING! ${gpu} → ${worker}`);
+      logActive(account.email, account.password, instId, sshHost, sshPort, gpu, worker);
+      return { success: true, workerCounter: workerCounter + 1 };
+    }
+
+    log(`      ❌ Miner failed → delete`);
     await api.deleteInstance(instId);
-    return { success: false };
   }
 
-  const sshHost = sshReady.ssh_host;
-  const sshPort = sshReady.ssh_port;
-  const totalTime = ((Date.now() - timerStart) / 1000).toFixed(0);
-  log(`   ✅ SSH: root@${sshHost} -p ${sshPort} (${totalTime}s total)`);
-
-  // Deploy miner
-  const worker = `rig${String(workerCounter).padStart(2, '0')}`;
-  log(`   ⛏️  Mining as ${worker}${isVast ? ' (vast.ai)' : ''}...`);
-
-  const mined = deployMiner(sshHost, sshPort, wallet, pool, worker, isVast);
-  if (mined) {
-    log(`   🔥 MINING ACTIVE! ${gpu} → ${worker}`);
-    logActive(null, null, instId, sshHost, sshPort, gpu, worker);
-    return { success: true };
-  }
-
-  log(`   ❌ Miner deploy failed → delete`);
-  await api.deleteInstance(instId);
-  return { success: false };
+  log(`   ❌ No GPU started`);
+  return { success: false, workerCounter };
 }
 
-// ─── MAIN LOOP ────────────────────────────────────────────────────
+// ─── MAIN ─────────────────────────────────────────────────────────
 async function main() {
-  const args = parseArgs();
-  if (!args.email || !args.password) {
-    console.log('Usage: node src/sniper.js --email user@x.com --password pw123');
-    return;
-  }
+  const accountFile = path.resolve(accountsFile);
+  const accounts = parseAccounts(accountFile);
 
   log('='.repeat(55));
-  log('🎯 QuData GPU Sniper v2 (rent monitor 1s)');
+  log('🎯 QuData GPU Sniper v3 (bulk)');
   log('='.repeat(55));
-  log(`Account:  ${args.email}`);
+  log(`Accounts: ${accounts.length}`);
   log(`Wallet:   ${wallet.substring(0, 20)}...`);
   log(`Price:    $${priceMin}-$${priceMax}/hr`);
   log('='.repeat(55));
-
-  const api = new QuDataAPI();
-  const loggedIn = await api.login(args.email, args.password);
-  if (!loggedIn) { log('❌ Login failed'); return; }
-
-  const balance = await api.getBalance();
-  log(`💰 Balance: $${balance.toFixed(3)} USDT`);
-
-  const keyId = await api.ensureSSHKey(sshKeyName, sshPublicKey);
-  if (!keyId) { log('❌ SSH key failed'); return; }
-
-  // Clean existing instances
-  log('🧹 Cleaning existing instances...');
-  const existing = await api.getInstances();
-  for (const inst of existing) {
-    log(`   🗑️ Delete ${inst.id?.substring(0, 12)}... (${inst.status})`);
-    await api.deleteInstance(inst.id);
-  }
 
   let workerCounter = 1;
   let round = 0;
 
   while (true) {
     round++;
-    log(`\n--- Round ${round} [${ts()}] ---`);
+    log(`\n${'='.repeat(55)}`);
+    log(`Round ${round} [${ts()}]`);
+    log('='.repeat(55));
 
-    const balanceNow = await api.getBalance();
-    log(`💰 Balance: $${balanceNow.toFixed(3)} USDT`);
-
-    if (balanceNow < 0.05) {
-      log('⚠️ Balance too low (< $0.05). Tunggu 60s...');
-      await sleep(60);
-      continue;
-    }
-
-    // Fetch offers
-    const offers = await api.getOffersAll(priceMin, priceMax);
+    // Fetch offers sekali per round
+    const sampleApi = new QuDataAPI();
+    await sampleApi.login(accounts[0].email, accounts[0].password);
+    const offers = await sampleApi.getOffersAll(priceMin, priceMax);
     log(`📦 ${offers.length} offers available`);
 
     if (!offers.length) {
@@ -252,30 +253,17 @@ async function main() {
       continue;
     }
 
-    // Coba semua offers
-    for (const offer of offers) {
-      const price = offer.prices?.[0]?.amount || 0;
-
-      // Cek balance cukup (minimal 1 menit billing)
-      const minCost = price / 60; // cost per menit
-      if (balanceNow < minCost) {
-        continue; // skip, balance nggak cukup bahkan 1 menit
-      }
-
-      const result = await tryRent(api, offer, keyId, workerCounter);
+    // Try setiap akun
+    for (const account of accounts) {
+      const result = await tryRentForAccount(account, offers, workerCounter);
       if (result.success) {
-        workerCounter++;
+        workerCounter = result.workerCounter;
         log(`🎉 Total miners: ${workerCounter - 1}`);
-
-        // Refresh balance
-        const newBal = await api.getBalance();
-        log(`💰 Balance: $${newBal.toFixed(3)} USDT`);
-        break; // keluar dari loop offers, mulai round baru
       }
     }
 
-    log(`⏳ Next round in 5s...`);
-    await sleep(5);
+    log(`\n⏳ Round selesai. Tunggu 10s...`);
+    await sleep(10);
   }
 }
 

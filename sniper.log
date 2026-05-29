@@ -253,3 +253,81 @@
 [12:06:22]       [0s] [pending] pending 
 [12:06:28]       [5s] [pending] pending 
 [12:06:33]       [11s] [pending] pending 
+[12:06:39]       [16s] [pending] Instance gone!
+[12:06:39]    ⏰ Pending timeout → delete
+[12:06:39] 💰 Balance after: $0.270 USDT
+[12:06:39] 
+🎯 SNIPE: RTX PRO 4000 @ $1.03/hr [6a0b69be]
+      [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
+[12:06:39]    ❌ Create failed
+[12:06:39] 💰 Balance after: $0.270 USDT
+[12:06:39] 
+🎯 SNIPE: A100 SXM4 @ $1.53/hr [6a197f7d]
+[12:06:41]    📦 6a19815057763573...
+[12:06:41]    ⏭️  Vast.ai detected (will use extra SSH wait)
+[12:06:41]    🔑 SSH key attached
+[12:06:41]       [0s] [pending] pending 
+[12:06:47]       [5s] [pending] pending 
+[12:06:52]       [11s] [pending] pending 
+[12:06:58]       [16s] [pending] pending 
+[12:07:03]       [22s] [pending] pending 
+[12:07:09]       [27s] [pending] pending 
+[12:07:15]       [33s] [pending] pending ec4b132704eb: Verifying Checksum
+ec4b132704eb: Download comp
+[12:07:20]       [39s] [pending] pending 2af2ec27548b: Verifying Checksum
+
+[12:07:26]       [44s] [pending] pending cb52d57868e6: Verifying Checksum
+cb52d57868e6: Download comp
+[12:07:31]       [50s] [pending] pending cb52d57868e6: Verifying Checksum
+cb52d57868e6: Download comp
+[12:07:37]       [55s] [pending] pending cb52d57868e6: Verifying Checksum
+cb52d57868e6: Download comp
+[12:07:42]       [61s] [pending] pending 38950b05bf0b: Pull complete
+
+[12:07:48]       [67s] [pending] pending 4d0fb3978b61: Pull complete
+
+[12:07:54]       [72s] [pending] pending 83963b245672: Pull complete
+
+[12:07:59]       [78s] [pending] pending 7a04f990c284: Pull complete
+
+[12:08:05]       [83s] [pending] pending 7a04f990c284: Pull complete
+
+[12:08:10]       [89s] [pending] pending cb52d57868e6: Pull complete
+
+[12:08:16]       [94s] [pending] pending #4 DONE 0.9s
+
+[12:08:22]       [100s] [pending] pending #6 2.002 Get:28 http://archive.ubuntu.com/ubuntu jammy-updat
+[12:08:27]       [106s] [pending] pending #7 2.622 Fetched 3380 kB in 0s (19.2 MB/s)
+#7 2.711 (Reading
+[12:08:33]       [111s] [pending] pending #8 0.468 Reading package lists...
+[12:08:38]       [117s] [pending] pending #12 0.831 Installing IPython kernel spec
+
+[12:08:43]       [122s] [pending] ⏰ Timeout 120s
+[12:08:43]    ⏰ Pending timeout → delete
+[12:08:44] 💰 Balance after: $0.270 USDT
+[12:08:44] ⏳ Next check in 10s...
+[12:08:54] 
+--- Round 3 [12:08:54] ---
+[12:08:55] 💰 Balance: $0.270 USDT
+[12:08:56] 📦 30 offers (5 new)
+[12:08:56] 
+🎯 SNIPE: RTX 4070 @ $0.44/hr [6a1973f7]
+[12:08:57]    📦 6a1981d8447a23cf...
+[12:08:57]    ⏭️  Vast.ai detected (will use extra SSH wait)
+[12:08:58]    🔑 SSH key attached
+[12:08:58]       [0s] [pending] pending 
+[12:09:03]       [5s] [pending] pending 
+[12:09:09]       [11s] [pending] pending 
+[12:09:14]       [16s] [pending] pending 
+[12:09:20]       [22s] [pending] pending 
+[12:09:26]       [28s] [pending] pending 
+[12:09:31]       [33s] [pending] pending 
+[12:09:37]       [39s] [pending] pending 
+[12:09:42]       [44s] [pending] pending 
+[12:09:48]       [50s] [pending] pending 
+[12:09:53]       [55s] [pending] pending 
+[12:09:59]       [61s] [pending] pending 
+[12:10:05]       [67s] [pending] pending 
+[12:10:10]       [72s] [pending] pending 
+[12:10:16]       [78s] [pending] pending 
+[12:10:21]       [83s] [pending] pending 
