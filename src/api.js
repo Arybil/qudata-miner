@@ -83,8 +83,12 @@ class QuDataAPI {
     const blacklist = ['vast', 'vastai', 'vast.ai'];
     return offers.filter(o => {
       const provider = (o.provider?.name || '').toLowerCase();
+      const gpu = (o.gpu_name || '').toLowerCase();
+      const image = (o.image || o.template?.image || '').toLowerCase();
+      const desc = (o.description || '').toLowerCase();
+      const allText = `${provider} ${gpu} ${image} ${desc}`;
       for (const b of blacklist) {
-        if (provider.includes(b)) return false;
+        if (allText.includes(b)) return false;
       }
       return true;
     });

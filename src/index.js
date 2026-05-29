@@ -133,6 +133,12 @@ async function pollUntil(api, instanceId, conditionFn, timeoutSec, label) {
         return null;
       }
 
+      // Cek vast.ai di status message
+      if (msg.includes('vast') || msg.includes('vastai')) {
+        log(`      [${sec}s] [${label}] ⏭️ Vast.ai detected in status`);
+        return 'vast_detected';
+      }
+
       log(`      [${sec}s] [${label}] ${status} ${msg}`);
     } catch (e) {
       log(`      [${sec}s] [${label}] Poll error: ${e.message}`);
@@ -205,6 +211,14 @@ async function processAccount(account, offers, workerCounter) {
     const instId = instData.id;
     log(`      📦 ${instId.substring(0, 16)}...`);
 
+    // Cek apakah instance dari vast.ai (dari status/image)
+    const instInfo = JSON.stringify(instData).toLowerCase();
+    if (instInfo.includes('vast') || instInfo.includes('vastai')) {
+      log(`      ⏭️  Vast.ai detected → delete & skip`);
+      await api.deleteInstance(instId);
+      continue;
+    }
+
     await api.attachSSHKey(instId, keyId);
     log(`      🔑 SSH key attached`);
 
@@ -214,6 +228,11 @@ async function processAccount(account, offers, workerCounter) {
       i => i.status === 'running',
       pendingTimeout, 'pending'
     );
+    if (running === 'vast_detected') {
+      log(`      ⏭️  Vast.ai → delete & skip`);
+      await api.deleteInstance(instId);
+      continue;
+    }
     if (!running) {
       log(`      ⏰ Pending timeout → cancel`);
       await api.deleteInstance(instId);
@@ -226,6 +245,11 @@ async function processAccount(account, offers, workerCounter) {
       i => i.ssh_enabled && i.ssh_host && i.ssh_port,
       sshTimeout, 'ssh'
     );
+    if (sshReady === 'vast_detected') {
+      log(`      ⏭️  Vast.ai → delete & skip`);
+      await api.deleteInstance(instId);
+      continue;
+    }
     if (!sshReady) {
       log(`      ⏰ SSH timeout → cancel`);
       await api.deleteInstance(instId);
