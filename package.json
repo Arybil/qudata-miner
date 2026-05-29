@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "check": "node src/index.js --check",
-    "rent": "node src/index.js"
+    "clean": "node src/index.js --clean",
+    "instances": "node src/index.js --instances",
+    "rent": "node src/index.js",
+    "sniper": "node src/sniper.js"
   },
   "dependencies": {
     "axios": "^1.7.0"
