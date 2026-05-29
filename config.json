@@ -9,7 +9,7 @@
   "priceMax": 2.50,
   "balanceMin": 0.10,
   "pendingTimeout": 60,
-  "sshTimeout": 10,
+  "sshTimeout": 30,
   "instanceDelay": 5,
   "activeLog": "./active-instances.txt",
   "accountsFile": "./accounts.txt"
