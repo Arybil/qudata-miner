@@ -88,6 +88,7 @@ function parseArgs() {
   const args = process.argv.slice(2);
   const result = {
     check: args.includes('--check'),
+    clean: args.includes('--clean'),
     email: null,
     password: null,
     accountFile: null,
@@ -309,6 +310,50 @@ async function checkBalances(accounts) {
   console.log(`\nFunded: ${funded.length}/${accounts.length}`);
 }
 
+// ─── CLEAN ALL INSTANCES ──────────────────────────────────────────
+async function cleanInstances(accounts) {
+  log(`\n🧹 Cleaning instances for ${accounts.length} accounts...`);
+  let totalDeleted = 0;
+  let totalFailed = 0;
+
+  for (let i = 0; i < accounts.length; i++) {
+    const acc = accounts[i];
+    const api = new QuDataAPI();
+    const ok = await api.login(acc.email, acc.password);
+
+    if (!ok) {
+      log(`  [${i + 1}] ${acc.email} — LOGIN FAILED`);
+      continue;
+    }
+
+    const instances = await api.getInstances();
+    if (!instances.length) {
+      log(`  [${i + 1}] ${acc.email} — clean ✅`);
+      continue;
+    }
+
+    log(`  [${i + 1}] ${acc.email} — ${instances.length} instance(s) found`);
+    for (const inst of instances) {
+      const instId = inst.id?.substring(0, 12) || '?';
+      const gpu = inst.offer?.gpu_name || '?';
+      const status = inst.status || '?';
+      log(`      🗑️  ${instId}... ${gpu} (${status}) → deleting...`);
+
+      try {
+        await api.deleteInstance(inst.id);
+        totalDeleted++;
+        log(`      ✅ Deleted`);
+      } catch {
+        totalFailed++;
+        log(`      ❌ Delete failed`);
+      }
+    }
+    await sleep(1);
+  }
+
+  log(`\n🧹 Cleanup done! Deleted: ${totalDeleted} | Failed: ${totalFailed}`);
+}
+
 // ─── MAIN ──────────────────────────────────────────────────────────
 async function main() {
   const args = parseArgs();
@@ -331,6 +376,11 @@ async function main() {
 
     if (args.check) {
       await checkBalances([account]);
+      return;
+    }
+
+    if (args.clean) {
+      await cleanInstances([account]);
       return;
     }
 
@@ -376,6 +426,14 @@ async function main() {
     await checkBalances(accounts);
     return;
   }
+
+  if (args.clean) {
+    await cleanInstances(accounts);
+    return;
+  }
+
+  // Auto-clean sebelum proses
+  await cleanInstances(accounts);
 
   const processed = loadProcessed();
   const pending = accounts.filter(a => !processed.has(a.email));
