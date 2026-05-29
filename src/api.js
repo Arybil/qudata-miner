@@ -108,12 +108,12 @@ class QuDataAPI {
       };
       const { data } = await this.session.post('/api/instances', payload);
       if (data.ok) return data.data;
-      console.log(`      [API] ❌ Create response not ok: ${JSON.stringify(data).substring(0, 200)}`);
+      console.log(`      [API] ❌ Response: ${JSON.stringify(data).substring(0, 300)}`);
       return null;
     } catch (e) {
       const status = e.response?.status || '?';
-      const msg = e.response?.data?.error || e.response?.data?.message || e.message;
-      console.log(`      [API] ❌ Create failed [${status}]: ${msg}`);
+      const body = e.response?.data ? JSON.stringify(e.response.data).substring(0, 300) : e.message;
+      console.log(`      [API] ❌ Failed [${status}]: ${body}`);
       return null;
     }
   }
