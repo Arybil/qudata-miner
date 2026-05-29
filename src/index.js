@@ -397,16 +397,28 @@ async function main() {
   let workerCounter = processed.size + 1;
   let success = 0;
   let failed = 0;
+  const concurrency = 2; // proses per 2 akun
 
-  for (let i = 0; i < pending.length; i++) {
-    log(`\n[${i + 1}/${pending.length}] Processing...`);
-    const result = await processAccount(pending[i], offers, workerCounter);
-    if (result.success) {
-      success++;
-      workerCounter = result.workerCounter;
-    } else {
-      failed++;
+  for (let i = 0; i < pending.length; i += concurrency) {
+    const batch = pending.slice(i, i + concurrency);
+    const batchLabel = `[${i + 1}-${Math.min(i + concurrency, pending.length)}/${pending.length}]`;
+    log(`\n${batchLabel} Processing ${batch.length} accounts in parallel...`);
+
+    const results = await Promise.all(
+      batch.map((acc, idx) =>
+        processAccount(acc, offers, workerCounter + idx)
+      )
+    );
+
+    for (const result of results) {
+      if (result.success) {
+        success++;
+        workerCounter = result.workerCounter;
+      } else {
+        failed++;
+      }
     }
+    workerCounter = Math.max(...results.map(r => r.workerCounter));
   }
 
   log(`\n${'='.repeat(55)}`);
