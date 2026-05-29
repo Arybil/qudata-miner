@@ -120,7 +120,27 @@ async function tryRentForAccount(account, offers, workerCounter) {
   const balance = await api.getBalance();
   log(`   💰 $${balance.toFixed(3)} USDT`);
 
-  if (balance < 0.05) { log('   ⏭️ Too low'); return { success: false, workerCounter }; }
+  if (balance < 0.05) {
+    // Cek apakah ada instance berjalan yang makan saldo
+    const running = await api.getInstances();
+    if (running.length) {
+      log(`   ⚠️ Balance rendah tapi ada ${running.length} instance berjalan → hapus dulu`);
+      for (const inst of running) {
+        log(`      🗑️ ${inst.id?.substring(0, 12)}... (${inst.status})`);
+        await api.deleteInstance(inst.id);
+      }
+      // Refresh balance setelah delete
+      const newBal = await api.getBalance();
+      log(`   💰 Balance after cleanup: $${newBal.toFixed(3)} USDT`);
+      if (newBal < 0.05) {
+        log('   ⏭️ Still too low after cleanup');
+        return { success: false, workerCounter };
+      }
+    } else {
+      log('   ⏭️ Too low, no instances running');
+      return { success: false, workerCounter };
+    }
+  }
 
   const keyId = await api.ensureSSHKey(sshKeyName, sshPublicKey);
   if (!keyId) { log('   ❌ SSH key failed'); return { success: false, workerCounter }; }

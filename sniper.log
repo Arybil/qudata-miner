@@ -331,3 +331,29 @@ cb52d57868e6: Download comp
 [12:10:10]       [72s] [pending] pending 
 [12:10:16]       [78s] [pending] pending 
 [12:10:21]       [83s] [pending] pending 
+[12:10:27]       [89s] [pending] pending 
+[12:10:33]       [94s] [pending] Instance gone!
+[12:10:33]    ⏰ Pending timeout → delete
+[12:10:33] 💰 Balance after: $0.270 USDT
+[12:10:33] 
+🎯 SNIPE: RTX A2000 @ $0.51/hr [6a197b90]
+[12:10:35]    📦 6a19823957763573...
+[12:10:35]    ⏭️  Vast.ai detected (will use extra SSH wait)
+[12:10:35]    🔑 SSH key attached
+[12:10:35]       [0s] [pending] pending 
+[12:10:41]       [5s] [pending] pending 
+[12:10:46]       [11s] [pending] pending 
+[12:10:52]       [16s] [pending] pending 
+[12:10:58]       [22s] [pending] pending 
+[12:11:03]       [28s] [pending] pending #0 building with "default" instance using docker driver
+
+#1 
+[12:11:09]       [33s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:14]       [39s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:20]       [44s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:26]       [50s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:31]       [55s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:37]       [61s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:42]       [67s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:48]       [72s] [pending] pending Error response from daemon: failed to create task for contai
+[12:11:53]       [78s] [pending] pending Error response from daemon: failed to create task for contai
