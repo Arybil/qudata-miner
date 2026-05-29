@@ -1,9 +1,9 @@
 /**
- * QuData GPU Sniper v3 — Bulk Mode
- *
- * Monitor & rent untuk SEMUA akun di accounts.txt.
- * Monitor status tiap 1 detik.
- *
+ * QuData GPU Sniper v4 — FULL PARALLEL
+ * 
+ * Semua akun jalan BARENGAN — gak ada yang nunggu.
+ * Auto-cleanup pending instances tiap 30 detik.
+ * 
  * Usage:
  *   node src/sniper.js
  */
@@ -31,6 +31,10 @@ function ts() {
 
 function log(msg) {
   console.log(`[${ts()}] ${msg}`);
+}
+
+function logTag(tag, msg) {
+  console.log(`[${ts()}] [${tag}] ${msg}`);
 }
 
 function sleep(seconds) {
@@ -66,7 +70,7 @@ function parseAccounts(filePath) {
 }
 
 // ─── POLL STATUS TIAP 1 DETIK ─────────────────────────────────────
-async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
+async function pollStatus(api, instanceId, conditionFn, timeoutSec, label, tag) {
   const start = Date.now();
   while ((Date.now() - start) / 1000 < timeoutSec) {
     const sec = ((Date.now() - start) / 1000).toFixed(0);
@@ -75,7 +79,7 @@ async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
       const inst = instances.find(i => i.id === instanceId);
 
       if (!inst) {
-        process.stdout.write(`\r      [${sec}s] [${label}] Instance gone!          `);
+        logTag(tag, `[${sec}s] [${label}] Instance gone!`);
         return null;
       }
 
@@ -83,20 +87,22 @@ async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
       const msg = (inst.message || '').substring(0, 40);
       const ssh = inst.ssh_enabled ? 'SSH:OK' : 'SSH:-';
 
-      process.stdout.write(`\r      [${sec}s] [${label}] ${status} ${ssh} ${msg}      `);
+      if (sec % 5 === 0) { // Log tiap 5 detik biar gak spam
+        logTag(tag, `[${sec}s] ${status} ${ssh} ${msg}`);
+      }
 
       if (conditionFn(inst)) {
-        console.log(`\n      [${sec}s] [${label}] ✅ Ready!`);
+        logTag(tag, `[${sec}s] ✅ Ready!`);
         return inst;
       }
 
       if (['error', 'failed', 'cancelled'].includes(status)) {
-        console.log(`\n      [${sec}s] [${label}] ❌ ${status} ${msg}`);
+        logTag(tag, `[${sec}s] ❌ ${status} ${msg}`);
         return null;
       }
 
       if (msg.includes('vast') || msg.includes('vastai')) {
-        console.log(`\n      [${sec}s] [${label}] ⏭️ Vast.ai detected`);
+        logTag(tag, `[${sec}s] ⏭️ Vast.ai detected`);
         return 'vast_detected';
       }
     } catch {}
@@ -104,51 +110,50 @@ async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
     await sleep(1);
   }
 
-  console.log(`\n      [${((Date.now() - start) / 1000).toFixed(0)}s] [${label}] ⏰ Timeout ${timeoutSec}s`);
+  logTag(tag, `[${timeoutSec}s] ⏰ Timeout`);
   return null;
 }
 
 // ─── RENT + MINE SATU AKUN ────────────────────────────────────────
 async function tryRentForAccount(account, offers, workerCounter) {
-  log(`\n${'─'.repeat(45)}`);
-  log(`👤 ${account.email}`);
+  const tag = account.email.substring(0, 12);
+  
+  logTag(tag, '─────────────────────────────────');
+  logTag(tag, `👤 Starting...`);
 
   const api = new QuDataAPI();
   const loggedIn = await api.login(account.email, account.password);
-  if (!loggedIn) { log('   ❌ Login failed'); return { success: false, workerCounter }; }
+  if (!loggedIn) { logTag(tag, '❌ Login failed'); return { success: false, workerCounter }; }
 
   const balance = await api.getBalance();
-  log(`   💰 $${balance.toFixed(3)} USDT`);
+  logTag(tag, `💰 $${balance.toFixed(3)} USDT`);
 
   if (balance < 0.05) {
-    // Cek apakah ada instance berjalan yang makan saldo
     const running = await api.getInstances();
     if (running.length) {
-      log(`   ⚠️ Balance rendah tapi ada ${running.length} instance berjalan → hapus dulu`);
+      logTag(tag, `⚠️ Balance rendah, hapus ${running.length} instance...`);
       for (const inst of running) {
-        log(`      🗑️ ${inst.id?.substring(0, 12)}... (${inst.status})`);
         await api.deleteInstance(inst.id);
       }
-      // Refresh balance setelah delete
       const newBal = await api.getBalance();
-      log(`   💰 Balance after cleanup: $${newBal.toFixed(3)} USDT`);
+      logTag(tag, `💰 After cleanup: $${newBal.toFixed(3)} USDT`);
       if (newBal < 0.05) {
-        log('   ⏭️ Still too low after cleanup');
+        logTag(tag, '⏭️ Still too low');
         return { success: false, workerCounter };
       }
     } else {
-      log('   ⏭️ Too low, no instances running');
+      logTag(tag, '⏭️ Balance too low');
       return { success: false, workerCounter };
     }
   }
 
   const keyId = await api.ensureSSHKey(sshKeyName, sshPublicKey);
-  if (!keyId) { log('   ❌ SSH key failed'); return { success: false, workerCounter }; }
+  if (!keyId) { logTag(tag, '❌ SSH key failed'); return { success: false, workerCounter }; }
 
   // Clean existing instances
   const existing = await api.getInstances();
   if (existing.length) {
-    log(`   🧹 Cleaning ${existing.length} instance(s)...`);
+    logTag(tag, `🧹 Cleaning ${existing.length} instance(s)...`);
     for (const inst of existing) {
       await api.deleteInstance(inst.id);
     }
@@ -160,58 +165,58 @@ async function tryRentForAccount(account, offers, workerCounter) {
     const gpu = offer.gpu_name || '?';
     const mins = price > 0 ? (balance / price * 60).toFixed(0) : '?';
 
-    log(`   🎯 ${gpu} @ $${price}/hr (~${mins}min)`);
+    logTag(tag, `🎯 ${gpu} @ $${price}/hr (~${mins}min)`);
 
     const timerStart = Date.now();
     const instData = await api.createInstance(offer.id, deploymentType, storageGb, image);
     if (!instData || instData.error) {
-      log(`      ❌ Create failed`);
+      logTag(tag, `❌ Create failed`);
       continue;
     }
 
     const instId = instData.id;
-    log(`      📦 ${instId.substring(0, 16)}...`);
+    logTag(tag, `📦 ${instId.substring(0, 16)}...`);
 
     let isVast = false;
     const instInfo = JSON.stringify(instData).toLowerCase();
     if (instInfo.includes('vast') || instInfo.includes('vastai')) {
       isVast = true;
-      log(`      ⏭️ Vast.ai detected`);
+      logTag(tag, `⏭️ Vast.ai detected`);
     }
 
     await api.attachSSHKey(instId, keyId);
-    log(`      🔑 SSH key attached`);
+    logTag(tag, `🔑 SSH key attached`);
 
     // Monitor pending (1s interval)
-    const running = await pollStatus(api, instId, i => i.status === 'running', 120, 'pending');
+    const running = await pollStatus(api, instId, i => i.status === 'running', 120, 'pending', tag);
 
     if (running === 'vast_detected') {
       isVast = true;
-      const running2 = await pollStatus(api, instId, i => i.status === 'running', 60, 'pending');
+      const running2 = await pollStatus(api, instId, i => i.status === 'running', 60, 'pending', tag);
       if (!running2 || running2 === 'vast_detected') {
-        log(`      ⏰ Not running → delete`);
+        logTag(tag, `⏰ Not running → delete`);
         await api.deleteInstance(instId);
         continue;
       }
     } else if (!running) {
-      log(`      ⏰ Timeout → delete`);
+      logTag(tag, `⏰ Timeout → delete`);
       await api.deleteInstance(instId);
       continue;
     }
 
     // Monitor SSH (1s interval)
-    const sshReady = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh');
+    const sshReady = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh', tag);
 
     if (sshReady === 'vast_detected') {
       isVast = true;
-      const sshReady2 = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh');
+      const sshReady2 = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, 30, 'ssh', tag);
       if (!sshReady2 || sshReady2 === 'vast_detected') {
-        log(`      ⏰ SSH not ready → delete`);
+        logTag(tag, `⏰ SSH not ready → delete`);
         await api.deleteInstance(instId);
         continue;
       }
     } else if (!sshReady) {
-      log(`      ⏰ SSH timeout → delete`);
+      logTag(tag, `⏰ SSH timeout → delete`);
       await api.deleteInstance(instId);
       continue;
     }
@@ -219,23 +224,23 @@ async function tryRentForAccount(account, offers, workerCounter) {
     const sshHost = sshReady.ssh_host;
     const sshPort = sshReady.ssh_port;
     const totalTime = ((Date.now() - timerStart) / 1000).toFixed(0);
-    log(`      ✅ SSH: root@${sshHost} -p ${sshPort} (${totalTime}s)`);
+    logTag(tag, `✅ SSH: root@${sshHost} -p ${sshPort} (${totalTime}s)`);
 
     const worker = `rig${String(workerCounter).padStart(2, '0')}`;
-    log(`      ⛏️ Mining as ${worker}...`);
+    logTag(tag, `⛏️ Mining as ${worker}...`);
 
     const mined = deployMiner(sshHost, sshPort, wallet, pool, worker, isVast);
     if (mined) {
-      log(`      🔥 MINING! ${gpu} → ${worker}`);
+      logTag(tag, `🔥 MINING! ${gpu} → ${worker}`);
       logActive(account.email, account.password, instId, sshHost, sshPort, gpu, worker);
       return { success: true, workerCounter: workerCounter + 1 };
     }
 
-    log(`      ❌ Miner failed → delete`);
+    logTag(tag, `❌ Miner failed → delete`);
     await api.deleteInstance(instId);
   }
 
-  log(`   ❌ No GPU started`);
+  logTag(tag, `❌ No GPU started`);
   return { success: false, workerCounter };
 }
 
@@ -254,8 +259,8 @@ async function cleanupPendingInstances(accounts) {
         for (const inst of instances) {
           if (inst.status === 'pending') {
             const age = inst.created_at ? (Date.now() - new Date(inst.created_at).getTime()) / 1000 : 0;
-            if (age > 30) { // pending > 30 detik = auto delete
-              log(`   🧹 [cleanup] ${account.email.substring(0,15)}.. pending ${age.toFixed(0)}s → delete`);
+            if (age > 30) {
+              log(`🧹 [cleanup] ${account.email.substring(0,12)}.. pending ${age.toFixed(0)}s → delete`);
               await api.deleteInstance(inst.id);
             }
           }
@@ -272,7 +277,7 @@ async function main() {
   const accounts = parseAccounts(accountFile);
 
   log('='.repeat(55));
-  log('🎯 QuData GPU Sniper v3 (bulk)');
+  log('🎯 QuData GPU Sniper v4 (FULL PARALLEL)');
   log('='.repeat(55));
   log(`Accounts: ${accounts.length}`);
   log(`Wallet:   ${wallet.substring(0, 20)}...`);
@@ -282,14 +287,14 @@ async function main() {
   let workerCounter = 1;
   let round = 0;
 
-  // Background cleanup setiap 30 detik — hapus pending instances
+  // Background cleanup setiap 30 detik
   setInterval(() => cleanupPendingInstances(accounts), 30 * 1000);
   log('🧹 Auto-cleanup pending: aktif (tiap 30s)');
 
   while (true) {
     round++;
     log(`\n${'='.repeat(55)}`);
-    log(`Round ${round} [${ts()}]`);
+    log(`🚀 Round ${round} [${ts()}] — ${accounts.length} akun paralel!`);
     log('='.repeat(55));
 
     // Fetch offers sekali per round
@@ -304,16 +309,25 @@ async function main() {
       continue;
     }
 
-    // Try setiap akun
-    for (const account of accounts) {
-      const result = await tryRentForAccount(account, offers, workerCounter);
-      if (result.success) {
-        workerCounter = result.workerCounter;
-        log(`🎉 Total miners: ${workerCounter - 1}`);
-      }
-    }
+    // SEMUA AKUN BARENGAN — Promise.all!
+    const tasks = accounts.map(account => 
+      tryRentForAccount(account, offers, workerCounter)
+        .then(result => {
+          if (result.success) {
+            workerCounter = result.workerCounter;
+            log(`🎉 Mining aktif! Total: ${workerCounter - 1}`);
+          }
+          return result;
+        })
+        .catch(err => {
+          log(`❌ ${account.email.substring(0,12)}.. error: ${err.message}`);
+          return { success: false, workerCounter };
+        })
+    );
 
-    log(`\n⏳ Round selesai. Tunggu 10s...`);
+    await Promise.all(tasks);
+
+    log(`\n⏳ Round ${round} selesai. Tunggu 10s...`);
     await sleep(10);
   }
 }

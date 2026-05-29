@@ -1,530 +1,61 @@
-[12:02:42] =======================================================
-[12:02:42] 🎯 QuData GPU Sniper
-[12:02:42] =======================================================
-[12:02:42] Account:  f1251nrin6@wshu.net
-[12:02:42] Wallet:   prl1pyrxc2vmpjlscatj...
-[12:02:42] Price:    $0.3-$3.5/hr
-[12:02:42] Interval: 10s
-[12:02:42] =======================================================
-[12:02:44] 💰 Balance: $0.300 USDT
-[12:02:44] 
---- Round 1 [12:02:44] ---
-[12:02:44] 💰 Balance: $0.300 USDT
-[12:02:45] 📦 31 offers (31 new)
-[12:02:45] 
-🎯 SNIPE: RTX A5000 @ $0.49/hr [69d3f465]
+[12:20:13] =======================================================
+[12:20:13] 🎯 QuData GPU Sniper v3 (bulk)
+[12:20:13] =======================================================
+[12:20:13] Accounts: 4
+[12:20:13] Wallet:   prl1pyrxc2vmpjlscatj...
+[12:20:13] Price:    $0.3-$3.5/hr
+[12:20:13] =======================================================
+[12:20:13] 🧹 Auto-cleanup pending: aktif (tiap 30s)
+[12:20:13] 
+=======================================================
+[12:20:13] Round 1 [12:20:13]
+[12:20:13] =======================================================
+[12:20:15] 📦 20 offers available
+[12:20:15] 
+─────────────────────────────────────────────
+[12:20:15] 👤 f1251nrin6@wshu.net
+[12:20:16]    💰 $0.270 USDT
+[12:20:16]    🧹 Cleaning 1 instance(s)...
+[12:20:17]    🎯 RTX 4070S @ $0.45/hr (~36min)
+[12:20:18]       📦 6a198481447a23cf...
+[12:20:18]       ⏭️ Vast.ai detected
+[12:20:18]       🔑 SSH key attached
+      [0s] [pending] pending SSH:-             [1s] [pending] pending SSH:-             [2s] [pending] pending SSH:-             [4s] [pending] pending SSH:-             [5s] [pending] pending SSH:-             [6s] [pending] pending SSH:-             [7s] [pending] pending SSH:-             [9s] [pending] pending SSH:-             [10s] [pending] pending SSH:-             [11s] [pending] pending SSH:-             [12s] [pending] pending SSH:-             [13s] [pending] pending SSH:-             [15s] [pending] pending SSH:-             [16s] [pending] pending SSH:-             [17s] [pending] pending SSH:-             [18s] [pending] pending SSH:-             [19s] [pending] pending SSH:-             [21s] [pending] pending SSH:-             [22s] [pending] pending SSH:-             [23s] [pending] pending SSH:-             [24s] [pending] pending SSH:-             [25s] [pending] pending SSH:-       [12:20:44]    🧹 [cleanup] 8fsd26kmc0@wshu.. pending 173s → delete
+      [27s] [pending] pending SSH:-             [28s] [pending] pending SSH:-             [29s] [pending] pending SSH:-             [31s] [pending] pending SSH:-             [32s] [pending] pending SSH:-             [33s] [pending] pending SSH:-             [34s] [pending] pending SSH:-             [36s] [pending] pending SSH:-             [37s] [pending] pending SSH:-             [38s] [pending] pending SSH:-             [39s] [pending] pending SSH:-             [40s] [pending] pending SSH:-             [42s] [pending] pending SSH:-             [43s] [pending] pending SSH:-             [44s] [pending] pending SSH:-             [45s] [pending] pending SSH:-             [46s] [pending] pending SSH:-             [48s] [pending] pending SSH:-             [49s] [pending] pending SSH:-             [50s] [pending] pending SSH:-             [51s] [pending] pending SSH:-             [52s] [pending] pending SSH:-             [54s] [pending] pending SSH:-             [55s] [pending] pending SSH:-       [12:21:14]    🧹 [cleanup] f1251nrin6@wshu.. pending 56s → delete
+      [56s] [pending] Instance gone!          [12:21:15]       ⏰ Timeout → delete
+[12:21:15]    🎯 RTX A5000 @ $0.49/hr (~33min)
       [API] ❌ Failed [424]: {"ok":false,"message":"Third party error"}
-[12:02:46]    ❌ Create failed
-[12:02:46] 💰 Balance after: $0.300 USDT
-[12:02:46] 
-🎯 SNIPE: Tesla P40 @ $0.63/hr [6a197f7d]
-[12:02:48]    📦 6a19806657763573...
-[12:02:48]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:02:48]    🔑 SSH key attached
-[12:02:48]       [0s] [pending] pending 
-[12:02:54]       [5s] [pending] pending 
-[12:02:59]       [11s] [pending] pending 
-[12:03:05]       [16s] [pending] pending 
-[12:03:10]       [22s] [pending] pending #0 building with "default" instance using docker driver
-
-#1 
-[12:03:16]       [27s] [pending] pending #7 3.731 Preparing to unpack .../01-libcbor0.8_0.8.0-2ubuntu
-[12:03:21]       [33s] [pending] pending #8 0.452 Reading package lists...
-[12:03:27]       [39s] [pending] pending #11 3.895 Collecting jupyter_http_over_ws
-
-[12:03:33]       [44s] [pending] pending #13 1.308 Collecting nbzip
-
-[12:03:38]       [50s] [pending] ⏭️ Vast.ai detected
-[12:03:38]       [0s] [pending] ⏭️ Vast.ai detected
-[12:03:38]    ⏰ Still not running → delete
-[12:03:39] 💰 Balance after: $0.300 USDT
-[12:03:39] 
-🎯 SNIPE: RTX 4060 @ $0.7285974499089253/hr [6a1891be]
-[12:03:39]    📦 6a19809bd51db8a0...
-[12:03:39]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:03:39]    🔑 SSH key attached
-[12:03:40]       [0s] [pending] pending 
-[12:03:45]       [5s] [pending] ❌ error 
-[12:03:45]    ⏰ Pending timeout → delete
-[12:03:46] 💰 Balance after: $0.300 USDT
-[12:03:46] 
-🎯 SNIPE: RTX 5060 Ti @ $0.79/hr [6a197f7d]
-[12:03:47]    📦 6a1980a20f52c75d...
-[12:03:47]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:03:47]    🔑 SSH key attached
-[12:03:47]       [0s] [pending] pending 
-[12:03:53]       [5s] [pending] pending 
-[12:03:58]       [11s] [pending] pending 
-[12:04:04]       [16s] [pending] pending 
-[12:04:10]       [22s] [pending] pending 
-[12:04:15]       [28s] [pending] ⏭️ Vast.ai detected
-[12:04:15]       [0s] [pending] ⏭️ Vast.ai detected
-[12:04:15]    ⏰ Still not running → delete
-[12:04:16] 💰 Balance after: $0.300 USDT
-[12:04:16] 
-🎯 SNIPE: RTX 2060 @ $0.82/hr [6a1973f7]
-[12:04:17]    📦 6a1980c030614549...
-[12:04:17]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:04:17]    🔑 SSH key attached
-[12:04:17]       [0s] [pending] pending 
-[12:04:23]       [5s] [pending] pending 
-[12:04:29]       [11s] [pending] pending 
-[12:04:34]       [16s] [pending] pending 
-[12:04:40]       [22s] [pending] pending 
-[12:04:45]       [28s] [pending] pending 
-[12:04:51]       [33s] [pending] ⏭️ Vast.ai detected
-[12:04:51]       [0s] [pending] ⏭️ Vast.ai detected
-[12:04:51]    ⏰ Still not running → delete
-[12:04:51] 💰 Balance after: $0.290 USDT
-[12:04:51] 
-🎯 SNIPE: GTX 1660 S @ $0.88/hr [6a1959e7]
-[12:04:53]    📦 6a1980e4447a23cf...
-[12:04:53]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:04:53]    🔑 SSH key attached
-[12:04:53]       [0s] [pending] pending 
-[12:04:59]       [5s] [pending] pending 
-[12:05:04]       [11s] [pending] pending 
-[12:05:10]       [16s] [pending] pending #3 transferring context: 2B done
-
-[12:05:15]       [22s] [pending] ✅ Ready!
-[12:05:16]       [0s] [ssh] ⏭️ Vast.ai detected
-[12:05:16]       [0s] [ssh] ⏭️ Vast.ai detected
-[12:05:16]    ⏰ SSH not ready → delete
-[12:05:16] 💰 Balance after: $0.290 USDT
-[12:05:16] 
-🎯 SNIPE: RTX 4070S @ $0.9/hr [6a197f7d]
+[12:21:16]       ❌ Create failed
+[12:21:16]    🎯 RTX 3060 @ $0.64/hr (~25min)
+[12:21:17]       📦 6a1984bcd51db8a0...
+[12:21:17]       ⏭️ Vast.ai detected
+[12:21:17]       🔑 SSH key attached
+      [0s] [pending] pending SSH:-             [1s] [pending] pending SSH:-             [2s] [pending] pending SSH:-             [4s] [pending] pending SSH:-             [5s] [pending] pending SSH:-             [6s] [pending] pending SSH:-             [7s] [pending] pending SSH:-             [8s] [pending] pending SSH:-             [10s] [pending] pending SSH:-             [11s] [pending] pending SSH:-             [12s] [pending] pending SSH:-             [13s] [pending] pending SSH:-             [14s] [pending] pending SSH:-             [16s] [pending] pending SSH:-             [17s] [pending] pending SSH:- Error response from daemon: failed to cr            [18s] [pending] pending SSH:- Error response from daemon: failed to cr            [19s] [pending] pending SSH:- Error response from daemon: failed to cr            [21s] [pending] pending SSH:- Error response from daemon: failed to cr            [22s] [pending] pending SSH:- Error response from daemon: failed to cr            [23s] [pending] pending SSH:- Error response from daemon: failed to cr            [24s] [pending] pending SSH:- Error response from daemon: failed to cr            [25s] [pending] pending SSH:- Error response from daemon: failed to cr            [27s] [pending] pending SSH:- Error response from daemon: failed to cr            [28s] [pending] pending SSH:- Error response from daemon: failed to cr            [29s] [pending] pending SSH:- Error response from daemon: failed to cr            [30s] [pending] pending SSH:- Error response from daemon: failed to cr            [31s] [pending] pending SSH:- Error response from daemon: failed to cr            [33s] [pending] pending SSH:- Error response from daemon: failed to cr            [34s] [pending] pending SSH:- Error response from daemon: failed to cr            [35s] [pending] pending SSH:- Error response from daemon: failed to cr            [36s] [pending] pending SSH:- Error response from daemon: failed to cr            [37s] [pending] pending SSH:- Error response from daemon: failed to cr            [39s] [pending] pending SSH:- Error response from daemon: failed to cr            [40s] [pending] pending SSH:- Error response from daemon: failed to cr            [41s] [pending] pending SSH:- Error response from daemon: failed to cr            [42s] [pending] pending SSH:- Error response from daemon: failed to cr            [43s] [pending] pending SSH:- Error response from daemon: failed to cr            [45s] [pending] pending SSH:- Error response from daemon: failed to cr            [46s] [pending] pending SSH:- Error response from daemon: failed to cr            [47s] [pending] pending SSH:- Error response from daemon: failed to cr            [48s] [pending] pending SSH:- Error response from daemon: failed to cr            [49s] [pending] pending SSH:- Error response from daemon: failed to cr            [51s] [pending] pending SSH:- Error response from daemon: failed to cr            [52s] [pending] pending SSH:- Error response from daemon: failed to cr            [53s] [pending] pending SSH:- Error response from daemon: failed to cr            [54s] [pending] pending SSH:- Error response from daemon: failed to cr            [55s] [pending] pending SSH:- Error response from daemon: failed to cr      [12:22:14]    🧹 [cleanup] f1251nrin6@wshu.. pending 57s → delete
+      [57s] [pending] Instance gone!          [12:22:14]       ⏰ Timeout → delete
+[12:22:15]    🎯 L4 @ $0.7/hr (~23min)
       [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:05:17]    ❌ Create failed
-[12:05:17] 💰 Balance after: $0.290 USDT
-[12:05:17] 
-🎯 SNIPE: GTX 1070 @ $1.02/hr [6a1973f7]
+[12:22:15]       ❌ Create failed
+[12:22:15]    🎯 RTX 4060 @ $0.7285974499089253/hr (~22min)
+[12:22:15]       📦 6a1984f7d51db8a0...
+[12:22:15]       ⏭️ Vast.ai detected
+[12:22:15]       🔑 SSH key attached
+      [0s] [pending] pending SSH:-             [1s] [pending] pending SSH:-             [2s] [pending] error SSH:-       
+      [2s] [pending] ❌ error 
+[12:22:18]       ⏰ Timeout → delete
+[12:22:18]    🎯 A40 @ $0.79/hr (~21min)
       [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:05:17]    ❌ Create failed
-[12:05:17] 💰 Balance after: $0.290 USDT
-[12:05:17] 
-🎯 SNIPE: RTX 4090 @ $1.092896174863388/hr [6a192b4e]
-[12:05:17]    📦 6a1980fd30614549...
-[12:05:17]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:05:18]    🔑 SSH key attached
-[12:05:18]       [0s] [pending] pending 
-[12:05:23]       [5s] [pending] ❌ error 
-[12:05:23]    ⏰ Pending timeout → delete
-[12:05:24] 💰 Balance after: $0.290 USDT
-[12:05:24] 
-🎯 SNIPE: RTX 3090 @ $1.19/hr [6a197b90]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:24]    ❌ Create failed
-[12:05:24] 💰 Balance after: $0.290 USDT
-[12:05:24] 
-🎯 SNIPE: GTX 1050 Ti @ $1.2/hr [6a192bc2]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:24]    ❌ Create failed
-[12:05:25] 💰 Balance after: $0.290 USDT
-[12:05:25] 
-🎯 SNIPE: Tesla P40 @ $1.24/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:25]    ❌ Create failed
-[12:05:25] 💰 Balance after: $0.290 USDT
-[12:05:25] 
-🎯 SNIPE: A800 PCIE @ $1.27/hr [6a1959e7]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:25]    ❌ Create failed
-[12:05:25] 💰 Balance after: $0.290 USDT
-[12:05:25] 
-🎯 SNIPE: RTX A4000 @ $1.31/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:26]    ❌ Create failed
-[12:05:26] 💰 Balance after: $0.290 USDT
-[12:05:26] 
-🎯 SNIPE: RTX 3060 @ $1.31/hr [6a192bc2]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:26]    ❌ Create failed
-[12:05:26] 💰 Balance after: $0.290 USDT
-[12:05:26] 
-🎯 SNIPE: GTX 1650 S @ $1.32/hr [6a192bc2]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:26]    ❌ Create failed
-[12:05:27] 💰 Balance after: $0.290 USDT
-[12:05:27] 
-🎯 SNIPE: GTX 1660 @ $1.34/hr [6a192bc2]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:27]    ❌ Create failed
-[12:05:27] 💰 Balance after: $0.290 USDT
-[12:05:27] 
-🎯 SNIPE: RTX 6000 Ada @ $1.39/hr [69d3f494]
-      [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:05:27]    ❌ Create failed
-[12:05:27] 💰 Balance after: $0.290 USDT
-[12:05:27] 
-🎯 SNIPE: A100 SXM4 @ $1.55/hr [6a197f7d]
-      [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:05:28]    ❌ Create failed
-[12:05:28] 💰 Balance after: $0.290 USDT
-[12:05:28] 
-🎯 SNIPE: RTX 5060 Ti @ $1.55/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:28]    ❌ Create failed
-[12:05:28] 💰 Balance after: $0.290 USDT
-[12:05:28] 
-🎯 SNIPE: RTX 5070 Ti @ $1.56/hr [6a196159]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:28]    ❌ Create failed
-[12:05:29] 💰 Balance after: $0.290 USDT
-[12:05:29] 
-🎯 SNIPE: RTX 5090 @ $1.7/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:29]    ❌ Create failed
-[12:05:29] 💰 Balance after: $0.290 USDT
-[12:05:29] 
-🎯 SNIPE: RTX 5090 @ $1.78/hr [69d3f464]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:29]    ❌ Create failed
-[12:05:29] 💰 Balance after: $0.290 USDT
-[12:05:29] 
-🎯 SNIPE: RTX 5080 @ $1.92/hr [6a197b91]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:30]    ❌ Create failed
-[12:05:30] 💰 Balance after: $0.280 USDT
-[12:05:30] 
-🎯 SNIPE: RTX 3080 Ti @ $1.96/hr [6a197b91]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:30]    ❌ Create failed
-[12:05:30] 💰 Balance after: $0.280 USDT
-[12:05:30] 
-🎯 SNIPE: RTX PRO 6000 WS @ $2.22/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:30]    ❌ Create failed
-[12:05:31] 💰 Balance after: $0.280 USDT
-[12:05:31] 
-🎯 SNIPE: A800 PCIE @ $2.54/hr [6a1959e7]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:31]    ❌ Create failed
-[12:05:31] 💰 Balance after: $0.280 USDT
-[12:05:31] 
-🎯 SNIPE: RTX 4090 @ $2.62/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:31]    ❌ Create failed
-[12:05:31] 💰 Balance after: $0.280 USDT
-[12:05:31] 
-🎯 SNIPE: Titan RTX @ $2.95/hr [6a143ecb]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:32]    ❌ Create failed
-[12:05:32] 💰 Balance after: $0.280 USDT
-[12:05:32] 
-🎯 SNIPE: RTX 4090 @ $2.95/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:32]    ❌ Create failed
-[12:05:32] 💰 Balance after: $0.280 USDT
-[12:05:32] 
-🎯 SNIPE: RTX 5090 @ $3.32/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:05:32]    ❌ Create failed
-[12:05:33] 💰 Balance after: $0.280 USDT
-[12:05:33] ⏳ Next check in 10s...
-[12:05:43] 
---- Round 2 [12:05:43] ---
-[12:05:43] 💰 Balance: $0.280 USDT
-[12:05:45] 📦 27 offers (5 new)
-[12:05:45] 
-🎯 SNIPE: RTX 5060 Ti @ $0.8/hr [6a197f7d]
-[12:05:46]    📦 6a198119447a23cf...
-[12:05:46]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:05:46]    🔑 SSH key attached
-[12:05:46]       [0s] [pending] pending 
-[12:05:52]       [5s] [pending] pending 
-[12:05:57]       [11s] [pending] pending 
-[12:06:03]       [16s] [pending] pending 
-[12:06:09]       [22s] [pending] pending 
-[12:06:14]       [28s] [pending] pending 
-[12:06:20]       [33s] [pending] ⏭️ Vast.ai detected
-[12:06:20]       [0s] [pending] ⏭️ Vast.ai detected
-[12:06:20]    ⏰ Still not running → delete
-[12:06:20] 💰 Balance after: $0.280 USDT
-[12:06:20] 
-🎯 SNIPE: RTX 3090 @ $0.83/hr [69d3f464]
-      [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:06:21]    ❌ Create failed
-[12:06:21] 💰 Balance after: $0.280 USDT
-[12:06:21] 
-🎯 SNIPE: RTX 2060 @ $0.89/hr [6a197f7d]
-[12:06:22]    📦 6a19813dd51db8a0...
-[12:06:22]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:06:22]    🔑 SSH key attached
-[12:06:22]       [0s] [pending] pending 
-[12:06:28]       [5s] [pending] pending 
-[12:06:33]       [11s] [pending] pending 
-[12:06:39]       [16s] [pending] Instance gone!
-[12:06:39]    ⏰ Pending timeout → delete
-[12:06:39] 💰 Balance after: $0.270 USDT
-[12:06:39] 
-🎯 SNIPE: RTX PRO 4000 @ $1.03/hr [6a0b69be]
-      [API] ❌ Failed [404]: {"ok":false,"message":"Not Found"}
-[12:06:39]    ❌ Create failed
-[12:06:39] 💰 Balance after: $0.270 USDT
-[12:06:39] 
-🎯 SNIPE: A100 SXM4 @ $1.53/hr [6a197f7d]
-[12:06:41]    📦 6a19815057763573...
-[12:06:41]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:06:41]    🔑 SSH key attached
-[12:06:41]       [0s] [pending] pending 
-[12:06:47]       [5s] [pending] pending 
-[12:06:52]       [11s] [pending] pending 
-[12:06:58]       [16s] [pending] pending 
-[12:07:03]       [22s] [pending] pending 
-[12:07:09]       [27s] [pending] pending 
-[12:07:15]       [33s] [pending] pending ec4b132704eb: Verifying Checksum
-ec4b132704eb: Download comp
-[12:07:20]       [39s] [pending] pending 2af2ec27548b: Verifying Checksum
-
-[12:07:26]       [44s] [pending] pending cb52d57868e6: Verifying Checksum
-cb52d57868e6: Download comp
-[12:07:31]       [50s] [pending] pending cb52d57868e6: Verifying Checksum
-cb52d57868e6: Download comp
-[12:07:37]       [55s] [pending] pending cb52d57868e6: Verifying Checksum
-cb52d57868e6: Download comp
-[12:07:42]       [61s] [pending] pending 38950b05bf0b: Pull complete
-
-[12:07:48]       [67s] [pending] pending 4d0fb3978b61: Pull complete
-
-[12:07:54]       [72s] [pending] pending 83963b245672: Pull complete
-
-[12:07:59]       [78s] [pending] pending 7a04f990c284: Pull complete
-
-[12:08:05]       [83s] [pending] pending 7a04f990c284: Pull complete
-
-[12:08:10]       [89s] [pending] pending cb52d57868e6: Pull complete
-
-[12:08:16]       [94s] [pending] pending #4 DONE 0.9s
-
-[12:08:22]       [100s] [pending] pending #6 2.002 Get:28 http://archive.ubuntu.com/ubuntu jammy-updat
-[12:08:27]       [106s] [pending] pending #7 2.622 Fetched 3380 kB in 0s (19.2 MB/s)
-#7 2.711 (Reading
-[12:08:33]       [111s] [pending] pending #8 0.468 Reading package lists...
-[12:08:38]       [117s] [pending] pending #12 0.831 Installing IPython kernel spec
-
-[12:08:43]       [122s] [pending] ⏰ Timeout 120s
-[12:08:43]    ⏰ Pending timeout → delete
-[12:08:44] 💰 Balance after: $0.270 USDT
-[12:08:44] ⏳ Next check in 10s...
-[12:08:54] 
---- Round 3 [12:08:54] ---
-[12:08:55] 💰 Balance: $0.270 USDT
-[12:08:56] 📦 30 offers (5 new)
-[12:08:56] 
-🎯 SNIPE: RTX 4070 @ $0.44/hr [6a1973f7]
-[12:08:57]    📦 6a1981d8447a23cf...
-[12:08:57]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:08:58]    🔑 SSH key attached
-[12:08:58]       [0s] [pending] pending 
-[12:09:03]       [5s] [pending] pending 
-[12:09:09]       [11s] [pending] pending 
-[12:09:14]       [16s] [pending] pending 
-[12:09:20]       [22s] [pending] pending 
-[12:09:26]       [28s] [pending] pending 
-[12:09:31]       [33s] [pending] pending 
-[12:09:37]       [39s] [pending] pending 
-[12:09:42]       [44s] [pending] pending 
-[12:09:48]       [50s] [pending] pending 
-[12:09:53]       [55s] [pending] pending 
-[12:09:59]       [61s] [pending] pending 
-[12:10:05]       [67s] [pending] pending 
-[12:10:10]       [72s] [pending] pending 
-[12:10:16]       [78s] [pending] pending 
-[12:10:21]       [83s] [pending] pending 
-[12:10:27]       [89s] [pending] pending 
-[12:10:33]       [94s] [pending] Instance gone!
-[12:10:33]    ⏰ Pending timeout → delete
-[12:10:33] 💰 Balance after: $0.270 USDT
-[12:10:33] 
-🎯 SNIPE: RTX A2000 @ $0.51/hr [6a197b90]
-[12:10:35]    📦 6a19823957763573...
-[12:10:35]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:10:35]    🔑 SSH key attached
-[12:10:35]       [0s] [pending] pending 
-[12:10:41]       [5s] [pending] pending 
-[12:10:46]       [11s] [pending] pending 
-[12:10:52]       [16s] [pending] pending 
-[12:10:58]       [22s] [pending] pending 
-[12:11:03]       [28s] [pending] pending #0 building with "default" instance using docker driver
-
-#1 
-[12:11:09]       [33s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:14]       [39s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:20]       [44s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:26]       [50s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:31]       [55s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:37]       [61s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:42]       [67s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:48]       [72s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:53]       [78s] [pending] pending Error response from daemon: failed to create task for contai
-[12:11:59]       [83s] [pending] pending Error response from daemon: failed to create task for contai
-[12:12:05]       [89s] [pending] Instance gone!
-[12:12:05]    ⏰ Pending timeout → delete
-[12:12:05] 💰 Balance after: $0.270 USDT
-[12:12:05] 
-🎯 SNIPE: GTX 1060 @ $0.67/hr [6a194e35]
-[12:12:06]    📦 6a19829530614549...
-[12:12:06]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:12:06]    🔑 SSH key attached
-[12:12:07]       [0s] [pending] pending 
-[12:12:12]       [5s] [pending] pending 
-[12:12:18]       [11s] [pending] ⏭️ Vast.ai detected
-[12:12:18]       [0s] [pending] ⏭️ Vast.ai detected
-[12:12:18]    ⏰ Still not running → delete
-[12:12:18] 💰 Balance after: $0.270 USDT
-[12:12:18] 
-🎯 SNIPE: RTX PRO 4000 @ $0.78/hr [6a197f7d]
-[12:12:20]    📦 6a1982a2d51db8a0...
-[12:12:20]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:12:20]    🔑 SSH key attached
-[12:12:20]       [0s] [pending] pending 
-[12:12:26]       [5s] [pending] pending 
-[12:12:31]       [11s] [pending] pending 
-[12:12:37]       [16s] [pending] pending 
-[12:12:42]       [22s] [pending] pending 
-[12:12:48]       [28s] [pending] pending 
-[12:12:53]       [33s] [pending] pending 
-[12:12:59]       [39s] [pending] pending 
-[12:13:05]       [44s] [pending] pending 
-[12:13:10]       [50s] [pending] pending 
-[12:13:16]       [55s] [pending] pending 
-[12:13:21]       [61s] [pending] pending 
-[12:13:27]       [67s] [pending] pending 
-[12:13:33]       [72s] [pending] pending 
-[12:13:38]       [78s] [pending] pending 
-[12:13:44]       [83s] [pending] pending 
-[12:13:49]       [89s] [pending] pending 
-[12:13:55]       [94s] [pending] pending 
-[12:14:00]       [100s] [pending] pending 
-[12:14:06]       [106s] [pending] pending 
-[12:14:12]       [111s] [pending] pending 
-[12:14:17]       [117s] [pending] pending 
-[12:14:22]       [122s] [pending] ⏰ Timeout 120s
-[12:14:22]    ⏰ Pending timeout → delete
-[12:14:23] 💰 Balance after: $0.270 USDT
-[12:14:23] 
-🎯 SNIPE: RTX 5080 @ $1.92/hr [6a197b91]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:14:23]    ❌ Create failed
-[12:14:23] 💰 Balance after: $0.270 USDT
-[12:14:23] ⏳ Next check in 10s...
-[12:14:33] 
---- Round 4 [12:14:33] ---
-[12:14:34] 💰 Balance: $0.270 USDT
-[12:14:35] 📦 31 offers (1 new)
-[12:14:35] 
-🎯 SNIPE: Titan RTX @ $2.95/hr [6a143ecb]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:14:35]    ❌ Create failed
-[12:14:36] 💰 Balance after: $0.270 USDT
-[12:14:36] ⏳ Next check in 10s...
-[12:14:46] 
---- Round 5 [12:14:46] ---
-[12:14:46] 💰 Balance: $0.270 USDT
-[12:14:48] 📦 31 offers (0 new)
-[12:14:48] ⏳ No new offers. Next check in 10s...
-[12:14:58] 
---- Round 6 [12:14:58] ---
-[12:14:58] 💰 Balance: $0.270 USDT
-[12:15:00] 📦 30 offers (1 new)
-[12:15:00] 
-🎯 SNIPE: RTX 5090 @ $1.74/hr [6a197f7d]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:15:00]    ❌ Create failed
-[12:15:00] 💰 Balance after: $0.270 USDT
-[12:15:00] ⏳ Next check in 10s...
-[12:15:10] 
---- Round 7 [12:15:10] ---
-[12:15:11] 💰 Balance: $0.270 USDT
-[12:15:12] 📦 29 offers (0 new)
-[12:15:12] ⏳ No new offers. Next check in 10s...
-[12:15:22] 
---- Round 8 [12:15:22] ---
-[12:15:23] 💰 Balance: $0.270 USDT
-[12:15:24] 📦 31 offers (1 new)
-[12:15:24] 
-🎯 SNIPE: A40 @ $0.79/hr [69d3f464]
-      [API] ❌ Failed [424]: {"ok":false,"message":"Third party error"}
-[12:15:25]    ❌ Create failed
-[12:15:25] 💰 Balance after: $0.270 USDT
-[12:15:25] ⏳ Next check in 10s...
-[12:15:35] 
---- Round 9 [12:15:35] ---
-[12:15:36] 💰 Balance: $0.270 USDT
-[12:15:37] 📦 29 offers (0 new)
-[12:15:37] ⏳ No new offers. Next check in 10s...
-[12:15:47] 
---- Round 10 [12:15:47] ---
-[12:15:48] 💰 Balance: $0.270 USDT
-[12:15:49] 📦 30 offers (1 new)
-[12:15:49] 
-🎯 SNIPE: RTX 2000 Ada @ $0.43/hr [69d3f464]
-      [API] ❌ Failed [424]: {"ok":false,"message":"Third party error"}
-[12:15:50]    ❌ Create failed
-[12:15:50] 💰 Balance after: $0.270 USDT
-[12:15:50] ⏳ Next check in 10s...
-[12:16:00] 
---- Round 11 [12:16:00] ---
-[12:16:01] 💰 Balance: $0.270 USDT
-[12:16:03] 📦 32 offers (1 new)
-[12:16:03] 
-🎯 SNIPE: A100 SXM @ $2.68/hr [69d3f464]
-      [API] ❌ Failed [400]: {"ok":false,"message":"Insufficient balance"}
-[12:16:03]    ❌ Create failed
-[12:16:03] 💰 Balance after: $0.270 USDT
-[12:16:03] ⏳ Next check in 10s...
-[12:16:13] 
---- Round 12 [12:16:13] ---
-[12:16:14] 💰 Balance: $0.270 USDT
-[12:16:15] 📦 30 offers (0 new)
-[12:16:15] ⏳ No new offers. Next check in 10s...
-[12:16:25] 
---- Round 13 [12:16:25] ---
-[12:16:26] 💰 Balance: $0.270 USDT
-[12:16:27] 📦 20 offers (7 new)
-[12:16:27] 
-🎯 SNIPE: RTX 4070S @ $0.43/hr [6a197f7d]
-[12:16:29]    📦 6a19839bd51db8a0...
-[12:16:29]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:16:29]    🔑 SSH key attached
-[12:16:29]       [0s] [pending] pending 
-[12:16:35]       [5s] [pending] pending 
-[12:16:40]       [11s] [pending] pending 
-[12:16:46]       [16s] [pending] pending 
-[12:16:51]       [22s] [pending] pending 
-[12:16:57]       [28s] [pending] pending 
-[12:17:02]       [33s] [pending] pending 
-[12:17:08]       [39s] [pending] pending 
-[12:17:14]       [44s] [pending] pending 
-[12:17:19]       [50s] [pending] pending 
-[12:17:25]       [55s] [pending] pending 
-[12:17:30]       [61s] [pending] pending 
-[12:17:36]       [67s] [pending] pending 
-[12:17:42]       [72s] [pending] pending 
-[12:17:47]       [78s] [pending] pending 
-[12:17:53]       [83s] [pending] pending 
-[12:17:58]       [89s] [pending] pending 
-[12:18:04]       [94s] [pending] pending 
-[12:18:09]       [100s] [pending] pending 
-[12:18:15]       [106s] [pending] pending 
-[12:18:21]       [111s] [pending] pending 
-[12:18:26]       [117s] [pending] pending 
-[12:18:31]       [122s] [pending] ⏰ Timeout 120s
-[12:18:31]    ⏰ Pending timeout → delete
-[12:18:32] 💰 Balance after: $0.270 USDT
-[12:18:32] 
-🎯 SNIPE: RTX 3060 @ $0.64/hr [6a198398]
-[12:18:33]    📦 6a19841830614549...
-[12:18:33]    ⏭️  Vast.ai detected (will use extra SSH wait)
-[12:18:33]    🔑 SSH key attached
-[12:18:34]       [0s] [pending] pending 
-[12:18:39]       [5s] [pending] pending 
-[12:18:45]       [11s] [pending] pending 
-[12:18:50]       [16s] [pending] pending 
-[12:18:56]       [22s] [pending] pending 
-[12:19:02]       [28s] [pending] pending 
-[12:19:07]       [33s] [pending] pending Error response from daemon: failed to create task for contai
-[12:19:13]       [39s] [pending] pending Error response from daemon: failed to create task for contai
-[12:19:18]       [44s] [pending] pending Error response from daemon: failed to create task for contai
-[12:19:24]       [50s] [pending] pending Error response from daemon: failed to create task for contai
-[12:19:29]       [55s] [pending] pending Error response from daemon: failed to create task for contai
+[12:22:18]       ❌ Create failed
+[12:22:18]    🎯 RTX 2060 @ $0.79/hr (~21min)
+[12:22:19]       📦 6a1984fa30614549...
+[12:22:19]       ⏭️ Vast.ai detected
+[12:22:20]       🔑 SSH key attached
+      [0s] [pending] pending SSH:-             [1s] [pending] pending SSH:-             [2s] [pending] pending SSH:-             [4s] [pending] pending SSH:-             [5s] [pending] pending SSH:-             [6s] [pending] pending SSH:-             [7s] [pending] pending SSH:-             [8s] [pending] pending SSH:-             [10s] [pending] pending SSH:-             [11s] [pending] pending SSH:-             [12s] [pending] pending SSH:-             [13s] [pending] pending SSH:-             [14s] [pending] pending SSH:-             [16s] [pending] pending SSH:-             [17s] [pending] pending SSH:-             [18s] [pending] pending SSH:-             [19s] [pending] pending SSH:-             [20s] [pending] pending SSH:-             [22s] [pending] pending SSH:- #14 naming to docker.io/vastai/base-imag      
+      [22s] [pending] ⏭️ Vast.ai detected
+      [0s] [pending] pending SSH:- #14 naming to docker.io/vastai/base-imag      
+      [0s] [pending] ⏭️ Vast.ai detected
+[12:22:42]       ⏰ Not running → delete
+[12:22:42]    🎯 GTX 1660 S @ $0.86/hr (~19min)
+[12:22:43]       📦 6a19851230614549...
+[12:22:43]       ⏭️ Vast.ai detected
+[12:22:43]       🔑 SSH key attached
+      [0s] [pending] pending SSH:-             [1s] [pending] pending SSH:-             [2s] [pending] pending SSH:-             [4s] [pending] pending SSH:-             [5s] [pending] pending SSH:-       
