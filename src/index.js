@@ -396,28 +396,6 @@ async function main() {
     return;
   }
 
-  // Fetch offers
-  log('Fetching GPU offers...');
-  const sampleApi = new QuDataAPI();
-  await sampleApi.login(pending[0].email, pending[0].password);
-  const allOffers = await sampleApi.getOffersAll(priceMin, priceMax);
-  const offers = sampleApi.filterOffers(allOffers);
-
-  const blacklisted = allOffers.length - offers.length;
-  log(`Found ${allOffers.length} offers ($${priceMin}-$${priceMax}/hr):`);
-  if (blacklisted > 0) log(`⏭️  ${blacklisted} skipped (vast.ai blacklist)`);
-  for (const o of offers) {
-    const gpu = o.gpu_name || '?';
-    const price = o.prices?.[0]?.amount || 0;
-    const provider = o.provider?.name || '?';
-    log(`   ${gpu.padEnd(25)} $${price.toFixed(2)}/hr  (${provider})`);
-  }
-
-  if (!offers.length) {
-    log('No rentable offers found!');
-    return;
-  }
-
   let workerCounter = processed.size + 1;
   let success = 0;
   let failed = 0;
@@ -426,7 +404,20 @@ async function main() {
   for (let i = 0; i < pending.length; i += concurrency) {
     const batch = pending.slice(i, i + concurrency);
     const batchLabel = `[${i + 1}-${Math.min(i + concurrency, pending.length)}/${pending.length}]`;
-    log(`\n${batchLabel} Processing ${batch.length} accounts in parallel...`);
+    log(`\n${batchLabel} Processing ${batch.length} accounts...`);
+
+    // Re-fetch offers tiap batch (biar fresh)
+    log('   🔄 Fetching latest offers...');
+    const sampleApi = new QuDataAPI();
+    await sampleApi.login(batch[0].email, batch[0].password);
+    const offers = await sampleApi.getOffersAll(priceMin, priceMax);
+    log(`   Found ${offers.length} offers`);
+
+    if (!offers.length) {
+      log('   ⚠️ No offers available, skipping batch');
+      failed += batch.length;
+      continue;
+    }
 
     const results = await Promise.all(
       batch.map((acc, idx) =>
