@@ -89,6 +89,7 @@ function parseArgs() {
   const result = {
     check: args.includes('--check'),
     clean: args.includes('--clean'),
+    instances: args.includes('--instances'),
     email: null,
     password: null,
     accountFile: null,
@@ -328,6 +329,43 @@ async function checkBalances(accounts) {
   console.log(`\nFunded: ${funded.length}/${accounts.length}`);
 }
 
+// ─── CHECK INSTANCES ──────────────────────────────────────────────
+async function checkInstances(accounts) {
+  log(`\n📦 Checking instances for ${accounts.length} accounts...`);
+  let totalInstances = 0;
+
+  for (let i = 0; i < accounts.length; i++) {
+    const acc = accounts[i];
+    const api = new QuDataAPI();
+    const ok = await api.login(acc.email, acc.password);
+
+    if (!ok) {
+      log(`  [${i + 1}] ${acc.email} — LOGIN FAILED`);
+      continue;
+    }
+
+    const instances = await api.getInstances();
+    if (!instances.length) {
+      log(`  [${i + 1}] ${acc.email} — no instances`);
+      continue;
+    }
+
+    totalInstances += instances.length;
+    log(`  [${i + 1}] ${acc.email} — ${instances.length} instance(s):`);
+    for (const inst of instances) {
+      const instId = inst.id?.substring(0, 12) || '?';
+      const gpu = inst.offer?.gpu_name || inst.gpu_name || '?';
+      const status = inst.status || '?';
+      const ssh = inst.ssh_enabled ? `ssh://${inst.ssh_host}:${inst.ssh_port}` : 'no ssh';
+      const price = inst.offer?.prices?.[0]?.amount || inst.price || '?';
+      log(`      ${status.padEnd(10)} ${gpu.padEnd(20)} $${price}/hr  ${ssh}  [${instId}...]`);
+    }
+    await sleep(1);
+  }
+
+  log(`\n📦 Total instances: ${totalInstances}`);
+}
+
 // ─── CLEAN ALL INSTANCES ──────────────────────────────────────────
 async function cleanInstances(accounts) {
   log(`\n🧹 Cleaning instances for ${accounts.length} accounts...`);
@@ -402,6 +440,11 @@ async function main() {
       return;
     }
 
+    if (args.instances) {
+      await checkInstances([account]);
+      return;
+    }
+
     // Fetch offers
     log('Fetching GPU offers...');
     const sampleApi = new QuDataAPI();
@@ -447,6 +490,11 @@ async function main() {
 
   if (args.clean) {
     await cleanInstances(accounts);
+    return;
+  }
+
+  if (args.instances) {
+    await checkInstances(accounts);
     return;
   }
 
