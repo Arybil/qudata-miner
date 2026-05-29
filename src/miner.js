@@ -1,15 +1,13 @@
 /**
  * Mining deployment via SSH
  *
- * SSH connection: 5 percobaan, 3 detik per percobaan.
- * Kalau masih gagal → return false → auto delete + ganti GPU.
+ * Flow: tunggu 60s setelah SSH port muncul → 1 percobaan SSH → gagal = skip GPU
  */
 
 const { execSync } = require('child_process');
 
-const SSH_RETRIES = 5;
-const SSH_RETRY_DELAY = 3; // detik
-const SSH_CONNECT_TIMEOUT = 10; // detik per attempt
+const SSH_WAIT = 60;       // detik tunggu sebelum SSH attempt (key propagation)
+const SSH_CONNECT_TIMEOUT = 15; // detik per SSH connection attempt
 
 function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
   const sshBase = [
@@ -22,44 +20,34 @@ function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
     `root@${sshHost}`,
   ];
 
-  // ── SSH Connection: 5 retries, 3 detik间隔 ──
+  // ── Tunggu 60 detik agar SSH key propagate ke instance ──
+  console.log(`      [SSH] ⏳ Waiting ${SSH_WAIT}s for key propagation...`);
+  execSync(`sleep ${SSH_WAIT}`);
+
+  // ── 1 percobaan SSH ──
   let connected = false;
-  for (let attempt = 1; attempt <= SSH_RETRIES; attempt++) {
-    try {
-      const r = execSync([...sshBase, 'echo OK'].join(' '), {
-        encoding: 'utf-8',
-        timeout: (SSH_CONNECT_TIMEOUT + 5) * 1000,
-      });
-      if (r.includes('OK')) {
-        connected = true;
-        break;
-      }
-    } catch (e) {
-      const msg = (e.stderr || e.message || '').toString();
-      const isPermissionDenied = /permission denied|publickey|auth/i.test(msg);
-
-      if (isPermissionDenied) {
-        console.log(`      [SSH ${attempt}/${SSH_RETRIES}] ❌ Permission denied`);
-      } else {
-        console.log(`      [SSH ${attempt}/${SSH_RETRIES}] ❌ ${msg.substring(0, 80)}`);
-      }
-
-      if (attempt < SSH_RETRIES) {
-        console.log(`      [SSH] ⏳ Retry dalam ${SSH_RETRY_DELAY}s...`);
-        execSync(`sleep ${SSH_RETRY_DELAY}`);
-      }
+  try {
+    const r = execSync([...sshBase, 'echo OK'].join(' '), {
+      encoding: 'utf-8',
+      timeout: (SSH_CONNECT_TIMEOUT + 5) * 1000,
+    });
+    if (r.includes('OK')) {
+      connected = true;
+      console.log(`      [SSH] ✅ Connected!`);
     }
-  }
-
-  if (!connected) {
-    console.log(`      [SSH] ❌ Gagal ${SSH_RETRIES}x → skip GPU`);
+  } catch (e) {
+    const msg = (e.stderr || e.message || '').toString();
+    console.log(`      [SSH] ❌ Failed: ${msg.substring(0, 100)}`);
+    console.log(`      [SSH] ❌ Skip GPU`);
     return false;
   }
 
-  console.log(`      [SSH] ✅ Connected!`);
+  if (!connected) {
+    console.log(`      [SSH] ❌ No response → skip GPU`);
+    return false;
+  }
 
   // ── Deploy miner di tmux ──
-  const poolHost = pool.replace('stratum+tcp://', '');
   const mineCmd = [
     'tmux new-session -d -s mine "',
     `curl -sL -o alpha-miner https://pearl.alphapool.tech/alpha-miner && `,
@@ -93,7 +81,6 @@ function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
       return true;
     }
 
-    // Fallback: cek tmux session masih ada
     const ls = execSync([...sshBase, 'tmux ls'].join(' '), {
       encoding: 'utf-8',
       timeout: 10000,
@@ -104,9 +91,8 @@ function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
     }
 
     console.log(`      [MINER] ⚠️ tmux running tapi output unclear`);
-    return true; // assume ok
+    return true;
   } catch {
-    // SSH verify gagal, tapi miner udah di-deploy → assume ok
     console.log(`      [MINER] ⚠️ Verify SSH failed, assuming deployed`);
     return true;
   }
