@@ -122,7 +122,15 @@ class QuDataAPI {
   }
 
   async deleteInstance(instanceId) {
-    try { await this.session.delete(`/api/instances/${instanceId}`); } catch {}
+    try {
+      const { data } = await this.session.delete(`/api/instances/${instanceId}`);
+      return data?.ok !== false;
+    } catch (e) {
+      const status = e.response?.status || '?';
+      const msg = e.response?.data?.message || e.message;
+      console.log(`      [API] ❌ Delete failed [${status}]: ${msg}`);
+      return false;
+    }
   }
 
   async ensureSSHKey(keyName, publicKey) {
