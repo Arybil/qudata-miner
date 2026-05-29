@@ -170,15 +170,25 @@ async function processAccount(account, offers, workerCounter) {
     return { success: false, workerCounter };
   }
 
-  for (const offer of offers) {
-    const price = offer.prices?.[0]?.amount || 0;
-    if (price > balance) continue;
+  // Filter offers by balance
+  const affordable = offers.filter(o => (o.prices?.[0]?.amount || 0) <= balance);
+  const skipped = offers.length - affordable.length;
+  if (skipped > 0) log(`   ⏭️  ${skipped} offers skipped (price > balance)`);
 
+  if (!affordable.length) {
+    log('   ❌ No affordable offers');
+    return { success: false, workerCounter };
+  }
+
+  let attempt = 0;
+  for (const offer of affordable) {
+    attempt++;
+    const price = offer.prices?.[0]?.amount || 0;
     const gpu = offer.gpu_name || '?';
     const offerId = offer.id;
     const durationMin = price > 0 ? (balance / price) * 60 : 0;
 
-    log(`\n   🎮 ${gpu} @ $${price}/hr (~${durationMin.toFixed(0)}min)`);
+    log(`\n   [${attempt}/${affordable.length}] 🎮 ${gpu} @ $${price}/hr (~${durationMin.toFixed(0)}min)`);
 
     await sleep(instanceDelay);
 
@@ -301,18 +311,19 @@ async function main() {
     log('Fetching GPU offers...');
     const sampleApi = new QuDataAPI();
     await sampleApi.login(account.email, account.password);
-    const offers = await sampleApi.getOffers(priceMin, priceMax);
+    const allOffers = await sampleApi.getOffersAll(priceMin, priceMax);
+    const offers = allOffers.filter(o => {
+      const price = o.prices?.[0]?.amount || 0;
+      return price <= balance;
+    });
 
-    if (!offers.length) {
-      log('No rentable offers found!');
-      return;
-    }
-
-    log(`Found ${offers.length} offers`);
-    for (const o of offers.slice(0, 5)) {
+    log(`Found ${allOffers.length} offers in range $${priceMin}-$${priceMax}`);
+    log(`${offers.length} affordable with $${balance.toFixed(2)} balance`);
+    for (const o of allOffers) {
       const gpu = o.gpu_name || '?';
       const price = o.prices?.[0]?.amount || 0;
-      log(`   ${gpu.padEnd(25)} $${price.toFixed(2)}/hr`);
+      const affordable = price <= balance ? '✅' : '⏭️';
+      log(`   ${affordable} ${gpu.padEnd(25)} $${price.toFixed(2)}/hr`);
     }
 
     const result = await processAccount(account, offers, 1);
@@ -364,21 +375,20 @@ async function main() {
   log('Fetching GPU offers...');
   const sampleApi = new QuDataAPI();
   await sampleApi.login(pending[0].email, pending[0].password);
-  const offers = await sampleApi.getOffers(priceMin, priceMax);
+  const allOffers = await sampleApi.getOffersAll(priceMin, priceMax);
 
-  if (!offers.length) {
-    log('No rentable offers found!');
-    return;
-  }
-
-  log(`Found ${offers.length} rentable offers:`);
-  for (const o of offers.slice(0, 10)) {
+  log(`Found ${allOffers.length} rentable offers ($${priceMin}-$${priceMax}/hr):`);
+  for (const o of allOffers) {
     const gpu = o.gpu_name || '?';
     const price = o.prices?.[0]?.amount || 0;
     const provider = o.provider?.name || '?';
     log(`   ${gpu.padEnd(25)} $${price.toFixed(2)}/hr  (${provider})`);
   }
-  if (offers.length > 10) log(`   ... and ${offers.length - 10} more`);
+
+  if (!allOffers.length) {
+    log('No rentable offers found!');
+    return;
+  }
 
   let workerCounter = processed.size + 1;
   let success = 0;
@@ -386,7 +396,7 @@ async function main() {
 
   for (let i = 0; i < pending.length; i++) {
     log(`\n[${i + 1}/${pending.length}] Processing...`);
-    const result = await processAccount(pending[i], offers, workerCounter);
+    const result = await processAccount(pending[i], allOffers, workerCounter);
     if (result.success) {
       success++;
       workerCounter = result.workerCounter;

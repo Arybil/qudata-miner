@@ -73,6 +73,11 @@ class QuDataAPI {
       .sort((a, b) => (a.prices?.[0]?.amount || 999) - (b.prices?.[0]?.amount || 999));
   }
 
+  // Returns ALL rentable offers in price range (no balance filter)
+  async getOffersAll(priceMin, priceMax) {
+    return this.getOffers(priceMin, priceMax);
+  }
+
   async getTemplates() {
     try {
       const { data } = await this.session.get('/api/templates');
