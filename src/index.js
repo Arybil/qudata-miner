@@ -212,12 +212,12 @@ async function processAccount(account, offers, workerCounter) {
     const instId = instData.id;
     log(`      📦 ${instId.substring(0, 16)}...`);
 
-    // Cek apakah instance dari vast.ai (dari status/image)
+    // Cek apakah instance dari vast.ai
+    let isVast = false;
     const instInfo = JSON.stringify(instData).toLowerCase();
     if (instInfo.includes('vast') || instInfo.includes('vastai')) {
-      log(`      ⏭️  Vast.ai detected → delete & skip`);
-      await api.deleteInstance(instId);
-      continue;
+      isVast = true;
+      log(`      ⏭️  Vast.ai detected (will use extra SSH wait)`);
     }
 
     await api.attachSSHKey(instId, keyId);
@@ -230,11 +230,20 @@ async function processAccount(account, offers, workerCounter) {
       pendingTimeout, 'pending'
     );
     if (running === 'vast_detected') {
-      log(`      ⏭️  Vast.ai → delete & skip`);
-      await api.deleteInstance(instId);
-      continue;
-    }
-    if (!running) {
+      isVast = true;
+      log(`      ⏭️  Vast.ai detected (will use extra SSH wait)`);
+      // Tunggu sampai running
+      const running2 = await pollUntil(
+        api, instId,
+        i => i.status === 'running',
+        pendingTimeout, 'pending'
+      );
+      if (!running2 || running2 === 'vast_detected') {
+        log(`      ⏰ Still not running → delete & skip`);
+        await api.deleteInstance(instId);
+        continue;
+      }
+    } else if (!running) {
       log(`      ⏰ Pending timeout → cancel`);
       await api.deleteInstance(instId);
       continue;
@@ -247,11 +256,20 @@ async function processAccount(account, offers, workerCounter) {
       sshTimeout, 'ssh'
     );
     if (sshReady === 'vast_detected') {
-      log(`      ⏭️  Vast.ai → delete & skip`);
-      await api.deleteInstance(instId);
-      continue;
-    }
-    if (!sshReady) {
+      isVast = true;
+      log(`      ⏭️  Vast.ai in SSH phase (will use extra SSH wait)`);
+      const sshReady2 = await pollUntil(
+        api, instId,
+        i => i.ssh_enabled && i.ssh_host && i.ssh_port,
+        sshTimeout, 'ssh'
+      );
+      if (!sshReady2 || sshReady2 === 'vast_detected') {
+        log(`      ⏰ SSH still not ready → delete & skip`);
+        await api.deleteInstance(instId);
+        continue;
+      }
+      sshReady = sshReady2;
+    } else if (!sshReady) {
       log(`      ⏰ SSH timeout → cancel`);
       await api.deleteInstance(instId);
       continue;
@@ -264,9 +282,9 @@ async function processAccount(account, offers, workerCounter) {
 
     // Deploy miner
     const worker = `rig${String(workerCounter).padStart(2, '0')}`;
-    log(`      ⛏️  Mining as ${worker}...`);
+    log(`      ⛏️  Mining as ${worker}${isVast ? ' (vast.ai - extra wait)' : ''}...`);
 
-    const mined = deployMiner(sshHost, sshPort, wallet, pool, worker);
+    const mined = deployMiner(sshHost, sshPort, wallet, pool, worker, isVast);
     if (mined) {
       log(`      🔥 MINING ACTIVE! ${gpu} → ${worker}`);
       logActive(

@@ -9,7 +9,7 @@ const { execSync } = require('child_process');
 const SSH_WAIT = 60;       // detik tunggu sebelum SSH attempt (key propagation)
 const SSH_CONNECT_TIMEOUT = 15; // detik per SSH connection attempt
 
-function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
+function deployMiner(sshHost, sshPort, wallet, pool, workerName, isVast = false) {
   const sshBase = [
     'ssh',
     '-o', 'StrictHostKeyChecking=no',
@@ -20,11 +20,11 @@ function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
     `root@${sshHost}`,
   ];
 
-  // ── Tunggu 60 detik agar SSH key propagate ke instance ──
-  console.log(`      [SSH] ⏳ Waiting ${SSH_WAIT}s for key propagation...`);
-  execSync(`sleep ${SSH_WAIT}`);
+  const sshWait = isVast ? 120 : SSH_WAIT; // vast.ai: 2 menit, lainnya: 60s
+  console.log(`      [SSH] ⏳ Waiting ${sshWait}s for key propagation${isVast ? ' (vast.ai)' : ''}...`);
+  execSync(`sleep ${sshWait}`);
 
-  // ── 1 percobaan SSH ──
+  // ── Percobaan SSH ──
   let connected = false;
   try {
     const r = execSync([...sshBase, 'echo OK'].join(' '), {
@@ -38,12 +38,28 @@ function deployMiner(sshHost, sshPort, wallet, pool, workerName) {
   } catch (e) {
     const msg = (e.stderr || e.message || '').toString();
     console.log(`      [SSH] ❌ Failed: ${msg.substring(0, 100)}`);
-    console.log(`      [SSH] ❌ Skip GPU`);
-    return false;
+
+    // Vast.ai: coba sekali lagi setelah 2 menit
+    if (isVast) {
+      console.log(`      [SSH] ⏳ Vast.ai retry in 120s...`);
+      execSync('sleep 120');
+      try {
+        const r2 = execSync([...sshBase, 'echo OK'].join(' '), {
+          encoding: 'utf-8',
+          timeout: (SSH_CONNECT_TIMEOUT + 5) * 1000,
+        });
+        if (r2.includes('OK')) {
+          connected = true;
+          console.log(`      [SSH] ✅ Connected on retry!`);
+        }
+      } catch (e2) {
+        console.log(`      [SSH] ❌ Retry failed: ${(e2.stderr || e2.message || '').toString().substring(0, 100)}`);
+      }
+    }
   }
 
   if (!connected) {
-    console.log(`      [SSH] ❌ No response → skip GPU`);
+    console.log(`      [SSH] ❌ Skip GPU`);
     return false;
   }
 
