@@ -1,0 +1,16 @@
+{
+  "wallet": "prl1pyrxc2vmpjlscatja2e3p4xmcm2ty0eekwwuxm5fhgpn8es2dv78sfvfua2",
+  "pool": "stratum+tcp://us2.alphapool.tech:5566",
+  "sshKeyName": "mining-rig",
+  "sshPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7GQcHUDF/d6C2EA07c+Ja00K+335Lk+M6YWfG/C+Ii root@VM-0-7-debian",
+  "deploymentType": "jupyter",
+  "storageGb": 32,
+  "priceMin": 0.30,
+  "priceMax": 2.50,
+  "balanceMin": 0.10,
+  "pendingTimeout": 90,
+  "sshTimeout": 45,
+  "instanceDelay": 5,
+  "activeLog": "./active-instances.txt",
+  "accountsFile": "./accounts.txt"
+}

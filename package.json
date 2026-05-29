@@ -1,0 +1,14 @@
+{
+  "name": "qudata-miner",
+  "version": "1.0.0",
+  "description": "QuData GPU auto-rent + alpha-miner deployment bot",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node src/index.js --check",
+    "rent": "node src/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  }
+}
