@@ -227,10 +227,7 @@ async function main() {
       seenOffers.add(offer.id);
 
       const price = offer.prices?.[0]?.amount || 0;
-      if (price > balanceNow) {
-        log(`⏭️ ${offer.gpu_name} @ $${price}/hr — too expensive`);
-        continue;
-      }
+      const gpu = offer.gpu_name || '?';
 
       const result = await snipeOffer(api, offer, keyId, workerCounter);
       if (result.success) {
@@ -241,6 +238,11 @@ async function main() {
       // Refresh balance setelah beli
       const newBal = await api.getBalance();
       log(`💰 Balance after: $${newBal.toFixed(3)} USDT`);
+
+      if (newBal < 0.05) {
+        log('⚠️ Balance too low (< $0.05). Stopping.');
+        return;
+      }
     }
 
     log(`⏳ Next check in ${interval}s...`);
