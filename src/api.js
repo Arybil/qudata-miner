@@ -90,8 +90,13 @@ class QuDataAPI {
         storage_gb: storageGb,
       };
       const { data } = await this.session.post('/api/instances', payload);
-      return data.ok ? data.data : null;
-    } catch {
+      if (data.ok) return data.data;
+      console.log(`      [API] ❌ Create response not ok: ${JSON.stringify(data).substring(0, 200)}`);
+      return null;
+    } catch (e) {
+      const status = e.response?.status || '?';
+      const msg = e.response?.data?.error || e.response?.data?.message || e.message;
+      console.log(`      [API] ❌ Create failed [${status}]: ${msg}`);
       return null;
     }
   }

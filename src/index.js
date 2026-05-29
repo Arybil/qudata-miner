@@ -185,7 +185,7 @@ async function processAccount(account, offers, workerCounter) {
     const timerStart = Date.now();
     const instData = await api.createInstance(offerId, deploymentType, storageGb);
     if (!instData) {
-      log('      ❌ Create failed');
+      log(`      ❌ Create failed → next GPU`);
       continue;
     }
 
