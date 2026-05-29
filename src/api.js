@@ -93,13 +93,14 @@ class QuDataAPI {
     }
   }
 
-  async createInstance(offerId, deploymentType = 'jupyter', storageGb = 32) {
+  async createInstance(offerId, deploymentType = 'ubuntu', storageGb = 32, image = null) {
     try {
       const payload = {
         offer_id: offerId,
         deployment_type: deploymentType,
         storage_gb: storageGb,
       };
+      if (image) payload.image = image;
       const { data } = await this.session.post('/api/instances', payload);
       if (data.ok) return data.data;
       console.log(`      [API] ❌ Response: ${JSON.stringify(data).substring(0, 300)}`);

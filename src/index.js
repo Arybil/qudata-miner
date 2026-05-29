@@ -20,7 +20,7 @@ const config = JSON.parse(
 
 const {
   wallet, pool, sshKeyName, sshPublicKey,
-  deploymentType, storageGb,
+  deploymentType, image, storageGb,
   priceMin, priceMax, balanceMin,
   pendingTimeout, sshTimeout, instanceDelay,
   activeLog, accountsFile,
@@ -202,7 +202,7 @@ async function processAccount(account, offers, workerCounter) {
     await sleep(instanceDelay);
 
     const timerStart = Date.now();
-    const instData = await api.createInstance(offerId, deploymentType, storageGb);
+    const instData = await api.createInstance(offerId, deploymentType, storageGb, image);
     if (!instData || instData.error) {
       const err = instData?.error || 'unknown';
       const status = instData?.status || '';

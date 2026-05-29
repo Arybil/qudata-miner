@@ -4,6 +4,7 @@
   "sshKeyName": "mining-rig",
   "sshPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH/LbZDm4ETw9IQSL7wHnz+HTo26l+1XamrTMUndtTEz root@VM-e88227b3-cffc-42de-8ae9-ea9566799b1d",
   "deploymentType": "ubuntu",
+  "image": "ubuntu:latest",
   "storageGb": 80,
   "priceMin": 0.30,
   "priceMax": 3.50,
