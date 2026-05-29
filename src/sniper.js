@@ -1,12 +1,11 @@
 /**
- * QuData GPU Sniper
+ * QuData GPU Sniper v2
  *
- * Monitor marketplace terus-menerus. Kalau ada offer baru di range harga,
- * langsung beli + deploy miner.
+ * Monitor RENT status tiap 1 detik. Bukan marketplace.
+ * Terus coba create instance dari offers yang ada, monitor status real-time.
  *
  * Usage:
  *   node src/sniper.js --email user@x.com --password pw123
- *   node src/sniper.js --email user@x.com --password pw123 --interval 5
  */
 
 const fs = require('fs');
@@ -53,44 +52,68 @@ function logActive(email, password, instId, sshHost, sshPort, gpu, worker) {
 // ─── PARSE ARGS ────────────────────────────────────────────────────
 function parseArgs() {
   const args = process.argv.slice(2);
-  const result = { email: null, password: null, interval: 10 };
+  const result = { email: null, password: null };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--email' && args[i + 1]) result.email = args[++i];
     if (args[i] === '--password' && args[i + 1]) result.password = args[++i];
-    if (args[i] === '--interval' && args[i + 1]) result.interval = parseInt(args[++i]);
   }
   return result;
 }
 
-// ─── POLL WITH TIMER ───────────────────────────────────────────────
-async function pollUntil(api, instanceId, conditionFn, timeoutSec, label) {
+// ─── POLL STATUS TIAP 1 DETIK ─────────────────────────────────────
+async function pollStatus(api, instanceId, conditionFn, timeoutSec, label) {
   const start = Date.now();
   while ((Date.now() - start) / 1000 < timeoutSec) {
     const sec = ((Date.now() - start) / 1000).toFixed(0);
     try {
       const instances = await api.getInstances();
       const inst = instances.find(i => i.id === instanceId);
-      if (!inst) { log(`      [${sec}s] [${label}] Instance gone!`); return null; }
+
+      if (!inst) {
+        process.stdout.write(`\r      [${sec}s] [${label}] Instance gone!`);
+        return null;
+      }
+
       const status = inst.status || '';
-      const msg = (inst.message || '').substring(0, 60);
-      if (conditionFn(inst)) { log(`      [${sec}s] [${label}] ✅ Ready!`); return inst; }
-      if (['error', 'failed', 'cancelled'].includes(status)) { log(`      [${sec}s] [${label}] ❌ ${status} ${msg}`); return null; }
-      if (msg.includes('vast') || msg.includes('vastai')) { log(`      [${sec}s] [${label}] ⏭️ Vast.ai detected`); return 'vast_detected'; }
-      log(`      [${sec}s] [${label}] ${status} ${msg}`);
-    } catch (e) { log(`      [${sec}s] [${label}] Poll error: ${e.message}`); }
-    await sleep(5);
+      const msg = (inst.message || '').substring(0, 50);
+      const ssh = inst.ssh_enabled ? 'SSH:OK' : 'SSH:-';
+
+      process.stdout.write(`\r      [${sec}s] [${label}] ${status} ${ssh} ${msg}    `);
+
+      if (conditionFn(inst)) {
+        console.log(`\n      [${sec}s] [${label}] ✅ Ready!`);
+        return inst;
+      }
+
+      if (['error', 'failed', 'cancelled'].includes(status)) {
+        console.log(`\n      [${sec}s] [${label}] ❌ ${status} ${msg}`);
+        return null;
+      }
+
+      // Cek vast.ai di message
+      if (msg.includes('vast') || msg.includes('vastai')) {
+        console.log(`\n      [${sec}s] [${label}] ⏭️ Vast.ai detected`);
+        return 'vast_detected';
+      }
+    } catch (e) {
+      // silent retry
+    }
+
+    await sleep(1); // tiap 1 detik
   }
-  log(`      [${((Date.now() - start) / 1000).toFixed(0)}s] [${label}] ⏰ Timeout ${timeoutSec}s`);
+
+  console.log(`\n      [${((Date.now() - start) / 1000).toFixed(0)}s] [${label}] ⏰ Timeout ${timeoutSec}s`);
   return null;
 }
 
-// ─── SNIPER: BUY ONE OFFER ────────────────────────────────────────
-async function snipeOffer(api, offer, keyId, workerCounter) {
+// ─── RENT + MINE SATU OFFER ───────────────────────────────────────
+async function tryRent(api, offer, keyId, workerCounter) {
   const price = offer.prices?.[0]?.amount || 0;
   const gpu = offer.gpu_name || '?';
   const offerId = offer.id;
+  const mins = price > 0 ? (0.30 / price * 60).toFixed(0) : '?';
 
-  log(`\n🎯 SNIPE: ${gpu} @ $${price}/hr [${offerId.substring(0, 8)}]`);
+  log(`\n🎯 ${gpu} @ $${price}/hr (~${mins}min) [${offerId.substring(0, 8)}]`);
 
   const timerStart = Date.now();
   const instData = await api.createInstance(offerId, deploymentType, storageGb, image);
@@ -107,17 +130,19 @@ async function snipeOffer(api, offer, keyId, workerCounter) {
   const instInfo = JSON.stringify(instData).toLowerCase();
   if (instInfo.includes('vast') || instInfo.includes('vastai')) {
     isVast = true;
-    log(`   ⏭️  Vast.ai detected (will use extra SSH wait)`);
+    log(`   ⏭️  Vast.ai detected`);
   }
 
   await api.attachSSHKey(instId, keyId);
   log(`   🔑 SSH key attached`);
 
-  // Phase 1: Wait for running
-  const running = await pollUntil(api, instId, i => i.status === 'running', 120, 'pending');
+  // Phase 1: Monitor running (tiap 1 detik)
+  const running = await pollStatus(api, instId, i => i.status === 'running', 120, 'pending');
+
   if (running === 'vast_detected') {
     isVast = true;
-    const running2 = await pollUntil(api, instId, i => i.status === 'running', 60, 'pending');
+    log(`   ⏭️  Vast.ai - tunggu running...`);
+    const running2 = await pollStatus(api, instId, i => i.status === 'running', 60, 'pending');
     if (!running2 || running2 === 'vast_detected') {
       log(`   ⏰ Still not running → delete`);
       await api.deleteInstance(instId);
@@ -129,11 +154,12 @@ async function snipeOffer(api, offer, keyId, workerCounter) {
     return { success: false };
   }
 
-  // Phase 2: Wait for SSH
-  const sshReady = await pollUntil(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
+  // Phase 2: Monitor SSH port (tiap 1 detik)
+  const sshReady = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
+
   if (sshReady === 'vast_detected') {
     isVast = true;
-    const sshReady2 = await pollUntil(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
+    const sshReady2 = await pollStatus(api, instId, i => i.ssh_enabled && i.ssh_host && i.ssh_port, sshTimeout, 'ssh');
     if (!sshReady2 || sshReady2 === 'vast_detected') {
       log(`   ⏰ SSH not ready → delete`);
       await api.deleteInstance(instId);
@@ -166,23 +192,20 @@ async function snipeOffer(api, offer, keyId, workerCounter) {
   return { success: false };
 }
 
-// ─── MAIN SNIPER LOOP ─────────────────────────────────────────────
+// ─── MAIN LOOP ────────────────────────────────────────────────────
 async function main() {
   const args = parseArgs();
   if (!args.email || !args.password) {
-    console.log('Usage: node src/sniper.js --email user@x.com --password pw123 [--interval 10]');
+    console.log('Usage: node src/sniper.js --email user@x.com --password pw123');
     return;
   }
 
-  const interval = args.interval; // detik antar poll
-
   log('='.repeat(55));
-  log('🎯 QuData GPU Sniper');
+  log('🎯 QuData GPU Sniper v2 (rent monitor 1s)');
   log('='.repeat(55));
   log(`Account:  ${args.email}`);
   log(`Wallet:   ${wallet.substring(0, 20)}...`);
   log(`Price:    $${priceMin}-$${priceMax}/hr`);
-  log(`Interval: ${interval}s`);
   log('='.repeat(55));
 
   const api = new QuDataAPI();
@@ -195,8 +218,15 @@ async function main() {
   const keyId = await api.ensureSSHKey(sshKeyName, sshPublicKey);
   if (!keyId) { log('❌ SSH key failed'); return; }
 
+  // Clean existing instances
+  log('🧹 Cleaning existing instances...');
+  const existing = await api.getInstances();
+  for (const inst of existing) {
+    log(`   🗑️ Delete ${inst.id?.substring(0, 12)}... (${inst.status})`);
+    await api.deleteInstance(inst.id);
+  }
+
   let workerCounter = 1;
-  const seenOffers = new Set(); // track offer udah pernah dicoba
   let round = 0;
 
   while (true) {
@@ -207,46 +237,45 @@ async function main() {
     log(`💰 Balance: $${balanceNow.toFixed(3)} USDT`);
 
     if (balanceNow < 0.05) {
-      log('⚠️ Balance too low (< $0.05). Stopping.');
-      break;
-    }
-
-    const offers = await api.getOffersAll(priceMin, priceMax);
-    const newOffers = offers.filter(o => !seenOffers.has(o.id));
-
-    log(`📦 ${offers.length} offers (${newOffers.length} new)`);
-
-    if (!newOffers.length) {
-      log(`⏳ No new offers. Next check in ${interval}s...`);
-      await sleep(interval);
+      log('⚠️ Balance too low (< $0.05). Tunggu 60s...');
+      await sleep(60);
       continue;
     }
 
-    // Coba beli offer baru
-    for (const offer of newOffers) {
-      seenOffers.add(offer.id);
+    // Fetch offers
+    const offers = await api.getOffersAll(priceMin, priceMax);
+    log(`📦 ${offers.length} offers available`);
 
+    if (!offers.length) {
+      log('⏳ No offers. Tunggu 30s...');
+      await sleep(30);
+      continue;
+    }
+
+    // Coba semua offers
+    for (const offer of offers) {
       const price = offer.prices?.[0]?.amount || 0;
-      const gpu = offer.gpu_name || '?';
 
-      const result = await snipeOffer(api, offer, keyId, workerCounter);
-      if (result.success) {
-        workerCounter++;
-        log(`🎉 Sniped! Total miners: ${workerCounter - 1}`);
+      // Cek balance cukup (minimal 1 menit billing)
+      const minCost = price / 60; // cost per menit
+      if (balanceNow < minCost) {
+        continue; // skip, balance nggak cukup bahkan 1 menit
       }
 
-      // Refresh balance setelah beli
-      const newBal = await api.getBalance();
-      log(`💰 Balance after: $${newBal.toFixed(3)} USDT`);
+      const result = await tryRent(api, offer, keyId, workerCounter);
+      if (result.success) {
+        workerCounter++;
+        log(`🎉 Total miners: ${workerCounter - 1}`);
 
-      if (newBal < 0.05) {
-        log('⚠️ Balance too low (< $0.05). Stopping.');
-        return;
+        // Refresh balance
+        const newBal = await api.getBalance();
+        log(`💰 Balance: $${newBal.toFixed(3)} USDT`);
+        break; // keluar dari loop offers, mulai round baru
       }
     }
 
-    log(`⏳ Next check in ${interval}s...`);
-    await sleep(interval);
+    log(`⏳ Next round in 5s...`);
+    await sleep(5);
   }
 }
 
