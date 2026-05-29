@@ -312,14 +312,12 @@ async function main() {
     const sampleApi = new QuDataAPI();
     await sampleApi.login(account.email, account.password);
     const allOffers = await sampleApi.getOffersAll(priceMin, priceMax);
-    const offers = allOffers.filter(o => {
-      const price = o.prices?.[0]?.amount || 0;
-      return price <= balance;
-    });
+    const offers = sampleApi.filterOffers(allOffers);
 
+    const blacklisted = allOffers.length - offers.length;
     log(`Found ${allOffers.length} offers in range $${priceMin}-$${priceMax}`);
-    log(`${offers.length} affordable with $${balance.toFixed(2)} balance`);
-    for (const o of allOffers) {
+    if (blacklisted > 0) log(`⏭️  ${blacklisted} skipped (vast.ai blacklist)`);
+    for (const o of offers) {
       const gpu = o.gpu_name || '?';
       const price = o.prices?.[0]?.amount || 0;
       const affordable = price <= balance ? '✅' : '⏭️';
@@ -376,16 +374,19 @@ async function main() {
   const sampleApi = new QuDataAPI();
   await sampleApi.login(pending[0].email, pending[0].password);
   const allOffers = await sampleApi.getOffersAll(priceMin, priceMax);
+  const offers = sampleApi.filterOffers(allOffers);
 
-  log(`Found ${allOffers.length} rentable offers ($${priceMin}-$${priceMax}/hr):`);
-  for (const o of allOffers) {
+  const blacklisted = allOffers.length - offers.length;
+  log(`Found ${allOffers.length} offers ($${priceMin}-$${priceMax}/hr):`);
+  if (blacklisted > 0) log(`⏭️  ${blacklisted} skipped (vast.ai blacklist)`);
+  for (const o of offers) {
     const gpu = o.gpu_name || '?';
     const price = o.prices?.[0]?.amount || 0;
     const provider = o.provider?.name || '?';
     log(`   ${gpu.padEnd(25)} $${price.toFixed(2)}/hr  (${provider})`);
   }
 
-  if (!allOffers.length) {
+  if (!offers.length) {
     log('No rentable offers found!');
     return;
   }
@@ -396,7 +397,7 @@ async function main() {
 
   for (let i = 0; i < pending.length; i++) {
     log(`\n[${i + 1}/${pending.length}] Processing...`);
-    const result = await processAccount(pending[i], allOffers, workerCounter);
+    const result = await processAccount(pending[i], offers, workerCounter);
     if (result.success) {
       success++;
       workerCounter = result.workerCounter;

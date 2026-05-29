@@ -78,6 +78,18 @@ class QuDataAPI {
     return this.getOffers(priceMin, priceMax);
   }
 
+  // Filter out blacklisted providers (vast.ai etc)
+  filterOffers(offers) {
+    const blacklist = ['vast', 'vastai', 'vast.ai'];
+    return offers.filter(o => {
+      const provider = (o.provider?.name || '').toLowerCase();
+      for (const b of blacklist) {
+        if (provider.includes(b)) return false;
+      }
+      return true;
+    });
+  }
+
   async getTemplates() {
     try {
       const { data } = await this.session.get('/api/templates');
